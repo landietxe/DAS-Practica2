@@ -1,4 +1,4 @@
-package com.example.practica1.Actividades;
+package com.example.practica2.Actividades;
 
 
 import android.content.Context;
@@ -14,8 +14,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
-import com.example.practica1.R;
-import com.example.practica1.BD.miBD;
+import com.example.practica2.R;
+import com.example.practica2.BD.miBD;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;

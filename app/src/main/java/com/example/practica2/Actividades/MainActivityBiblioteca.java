@@ -1,4 +1,4 @@
-package com.example.practica1.Actividades;
+package com.example.practica2.Actividades;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -21,11 +21,11 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 
-import com.example.practica1.Dialogos.DialogoConfirmarBorrar;
-import com.example.practica1.Fragments.fragmentBiblioteca;
-import com.example.practica1.Fragments.fragmentInfoLibroBibliotecaLand;
-import com.example.practica1.R;
-import com.example.practica1.BD.miBD;
+import com.example.practica2.Dialogos.DialogoConfirmarBorrar;
+import com.example.practica2.Fragments.fragmentBiblioteca;
+import com.example.practica2.Fragments.fragmentInfoLibroBibliotecaLand;
+import com.example.practica2.R;
+import com.example.practica2.BD.miBD;
 
 import java.io.BufferedReader;
 import java.io.IOException;

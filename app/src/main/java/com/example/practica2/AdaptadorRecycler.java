@@ -1,4 +1,4 @@
-package com.example.practica1;
+package com.example.practica2;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,8 +9,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.practica1.Actividades.InfoLibro;
-import com.example.practica1.ViewHolder.ViewHolder;
+import com.example.practica2.Actividades.InfoLibro;
+import com.example.practica2.ViewHolder.ViewHolder;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;

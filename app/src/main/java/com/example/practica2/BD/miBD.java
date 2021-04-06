@@ -1,4 +1,4 @@
-package com.example.practica1.BD;
+package com.example.practica2.BD;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -8,9 +8,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import androidx.annotation.Nullable;
 
-import com.example.practica1.Libro;
+import com.example.practica2.Libro;
 
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 //Clase que extiende SQLiteOpenHelper para gestionar la base de datos de la aplicación
 public class miBD extends SQLiteOpenHelper {

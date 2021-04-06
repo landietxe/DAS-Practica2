@@ -1,7 +1,4 @@
-package com.example.practica1;
-
-import java.util.ArrayList;
-
+package com.example.practica2;
 
 
 //Clase auxiliar para guardar la información de los libros.

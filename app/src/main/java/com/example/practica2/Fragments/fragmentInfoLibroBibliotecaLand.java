@@ -1,4 +1,4 @@
-package com.example.practica1.Fragments;
+package com.example.practica2.Fragments;
 
 import android.content.Context;
 import android.content.Intent;
@@ -14,8 +14,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.example.practica1.R;
-import com.example.practica1.BD.miBD;
+import com.example.practica2.R;
+import com.example.practica2.BD.miBD;
 
 //Fragment que muestra la información de un libro seleccionado cuando el móvil se encuentra en orientación horizontal.
 public class fragmentInfoLibroBibliotecaLand extends Fragment{

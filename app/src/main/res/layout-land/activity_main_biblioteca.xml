@@ -14,7 +14,7 @@
 
         <fragment
             android:id="@+id/fragment2"
-            android:name="com.example.practica1.Fragments.fragmentBiblioteca"
+            android:name="com.example.practica2.Fragments.fragmentBiblioteca"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1" />
@@ -28,7 +28,7 @@
 
         <fragment
             android:id="@+id/fragment4"
-            android:name="com.example.practica1.Fragments.fragmentInfoLibroBibliotecaLand"
+            android:name="com.example.practica2.Fragments.fragmentInfoLibroBibliotecaLand"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1" />

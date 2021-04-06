@@ -1,4 +1,4 @@
-package com.example.practica1.Actividades;
+package com.example.practica2.Actividades;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
@@ -20,9 +20,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.practica1.AdaptadorRecycler;
-import com.example.practica1.Libro;
-import com.example.practica1.R;
+import com.example.practica2.AdaptadorRecycler;
+import com.example.practica2.Libro;
+import com.example.practica2.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;

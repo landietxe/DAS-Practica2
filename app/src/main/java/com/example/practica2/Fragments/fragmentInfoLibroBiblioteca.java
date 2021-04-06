@@ -1,4 +1,4 @@
-package com.example.practica1.Fragments;
+package com.example.practica2.Fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.example.practica1.R;
+import com.example.practica2.R;
 
 //Fragment que muestra la información de un libro seleccionado cuando el móvil se encuentra en orientación vertical.
 public class fragmentInfoLibroBiblioteca extends Fragment {

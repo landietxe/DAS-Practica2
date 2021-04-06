@@ -1,4 +1,4 @@
-package com.example.practica1.Actividades;
+package com.example.practica2.Actividades;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
@@ -10,7 +10,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.View;
 
-import com.example.practica1.R;
+import com.example.practica2.R;
 
 import java.util.Locale;
 

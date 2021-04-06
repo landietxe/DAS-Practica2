@@ -1,4 +1,4 @@
-package com.example.practica1.Fragments;
+package com.example.practica2.Fragments;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -15,10 +15,10 @@ import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.practica1.Libro;
-import com.example.practica1.R;
-import com.example.practica1.ViewHolder.ViewHolderBiblioteca;
-import com.example.practica1.BD.miBD;
+import com.example.practica2.Libro;
+import com.example.practica2.R;
+import com.example.practica2.ViewHolder.ViewHolderBiblioteca;
+import com.example.practica2.BD.miBD;
 import com.squareup.picasso.Picasso;
 
 import java.io.BufferedReader;

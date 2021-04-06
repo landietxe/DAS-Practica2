@@ -8,7 +8,7 @@
 
     <fragment
         android:id="@+id/fragment"
-        android:name="com.example.practica1.Fragments.fragmentInfoLibroBiblioteca"
+        android:name="com.example.practica2.Fragments.fragmentInfoLibroBiblioteca"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout_editor_absoluteX="60dp"

@@ -1,12 +1,10 @@
-package com.example.practica1.Preferencias;
+package com.example.practica2.Preferencias;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 
 import androidx.preference.PreferenceFragmentCompat;
 
-import com.example.practica1.R;
+import com.example.practica2.R;
 
 /*Clase que hereda de PreferenceFragmentCompat para permitir almacenar las
 preferencias al usuario en la aplicación.

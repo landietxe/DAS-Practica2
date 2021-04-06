@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.practica1">
+    package="com.example.practica2">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -11,13 +11,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:label="Bookmarked"
         android:theme="@style/TemaDAS">
-        <activity android:name=".Actividades.PreferenciasActivity"/>
-        <activity android:name=".Actividades.RegisterActivity" />
-        <activity android:name=".Actividades.InfoLibroBiblioteca" />
-        <activity android:name=".Actividades.MainActivity" />
-        <activity android:name=".Actividades.InfoLibro" />
-        <activity android:name=".Actividades.MainActivityBiblioteca" />
-        <activity android:name=".Actividades.LoginActivity">
+        <activity android:name="com.example.practica2.Actividades.PreferenciasActivity"/>
+        <activity android:name="com.example.practica2.Actividades.RegisterActivity" />
+        <activity android:name="com.example.practica2.Actividades.InfoLibroBiblioteca" />
+        <activity android:name="com.example.practica2.Actividades.MainActivity" />
+        <activity android:name="com.example.practica2.Actividades.InfoLibro" />
+        <activity android:name="com.example.practica2.Actividades.MainActivityBiblioteca" />
+        <activity android:name="com.example.practica2.Actividades.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

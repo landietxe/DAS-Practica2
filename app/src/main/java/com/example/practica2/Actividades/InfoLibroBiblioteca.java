@@ -1,4 +1,4 @@
-package com.example.practica1.Actividades;
+package com.example.practica2.Actividades;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
@@ -21,9 +21,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.practica1.Dialogos.DialogoConfirmarBorrar;
-import com.example.practica1.R;
-import com.example.practica1.BD.miBD;
+import com.example.practica2.Dialogos.DialogoConfirmarBorrar;
+import com.example.practica2.R;
+import com.example.practica2.BD.miBD;
 import com.squareup.picasso.Picasso;
 
 import java.io.BufferedReader;

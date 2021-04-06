@@ -1,13 +1,12 @@
-package com.example.practica1.ViewHolder;
+package com.example.practica2.ViewHolder;
 
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.practica1.R;
+import com.example.practica2.R;
 
 /*ViewHolder de la clase AdaptadorRecyclerBiblioteca*/
 public class ViewHolderBiblioteca extends RecyclerView.ViewHolder{

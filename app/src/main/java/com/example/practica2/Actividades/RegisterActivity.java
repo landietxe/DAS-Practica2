@@ -1,4 +1,4 @@
-package com.example.practica1.Actividades;
+package com.example.practica2.Actividades;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
@@ -13,8 +13,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.practica1.R;
-import com.example.practica1.BD.miBD;
+import com.example.practica2.R;
+import com.example.practica2.BD.miBD;
 
 import java.util.Locale;
 

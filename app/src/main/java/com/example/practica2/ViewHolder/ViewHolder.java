@@ -1,6 +1,5 @@
-package com.example.practica1.ViewHolder;
+package com.example.practica2.ViewHolder;
 
-import android.graphics.Color;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -8,7 +7,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.practica1.R;
+import com.example.practica2.R;
 
 /*ViewHolder de la clase AdaptadorRecycler*/
 public class ViewHolder extends RecyclerView.ViewHolder{
