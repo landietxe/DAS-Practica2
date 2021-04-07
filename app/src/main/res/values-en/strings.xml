@@ -35,11 +35,12 @@
     <string name="prefEditorial">Publisher</string>
     <string name="Registro">REGISTRATION</string>
     <string name="Registro2">Register</string>
-    <string name="ususuarioContraseña">User does not exist or password is incorrect</string>
+    <string name="ususuarioContraseña">The password is not correct</string>
     <string name="usuarioContraseña2">A user with that name already exists</string>
     <string name="descripcion">Description:</string>
     <string name="errorBusqueda">The search could not be completed</string>
     <string name="buscarLibro">FIND BOOKS</string>
     <string name="hintBusqueda">Title, author...</string>
     <string name="previsualizar">PREVIEW</string>
+    <string name="usuarioNoExiste">The user does not exist</string>
 </resources>

@@ -1,7 +1,12 @@
 package com.example.practica2.Actividades;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
 import androidx.preference.PreferenceManager;
+import androidx.work.Data;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
 
 import android.content.Context;
 import android.content.Intent;
@@ -15,6 +20,7 @@ import android.widget.Toast;
 
 import com.example.practica2.R;
 import com.example.practica2.BD.miBD;
+import com.example.practica2.WorkManager.InsertarUsuario;
 
 import java.util.Locale;
 
@@ -56,24 +62,35 @@ public class RegisterActivity extends AppCompatActivity {
         /*Método que se ejecuta cuando el usuario pulsa el botón de registrarse.
         Este método en primer lugar comprueba si ya existe un usuario con el nombre y contraseña introducidos.
         Si ya existe, se muestra un Toast indicándolo. En caso contrario, se añade el usuario a la base de datos
-        utilizando el método "insertarUsuario" definido en la clase "miBD".*/
+        remota mediante la clase "InsertarUsuario".*/
         String user=usuario.getText().toString();
         String password = contraseña.getText().toString();
 
         if(!user.equals("")){
-            int id = gestorDB.getUsuario(user,password);
-            if(id != -1){ //El usuario existe
-                String mensaje = getString(R.string.usuarioContraseña2);
-                Toast toast = Toast.makeText(this, mensaje, Toast.LENGTH_SHORT);
-                toast.setGravity( Gravity.CENTER_VERTICAL, 0, 0);
-                toast.show();
-            }
-            else{ //El usuario no existe
-                gestorDB.insertarUsuario(user,password);
-                Intent intent = new Intent(this,LoginActivity.class);
-                //intent.putExtra("id",id);
-                startActivity(intent);
-            }
+            Data datos = new Data.Builder()
+                    .putString("username",user)
+                    .putString("password",password)
+                    .build();
+            OneTimeWorkRequest otwr = new OneTimeWorkRequest.Builder(InsertarUsuario.class).setInputData(datos).build();
+            WorkManager.getInstance(this).getWorkInfoByIdLiveData(otwr.getId())
+                    .observe(this, new Observer<WorkInfo>() {
+                        @Override
+                        public void onChanged(WorkInfo workInfo) {
+                            if(workInfo != null && workInfo.getState().isFinished()){
+                                if("SUCCEEDED".equals(workInfo.getState().name())){
+                                    Intent intent = new Intent(getApplicationContext(),LoginActivity.class);
+                                    startActivity(intent);
+                                }
+                                else{
+                                    String mensaje = getString(R.string.usuarioContraseña2);
+                                    Toast toast = Toast.makeText(getApplicationContext(), mensaje, Toast.LENGTH_SHORT);
+                                    toast.setGravity( Gravity.CENTER_VERTICAL, 0, 0);
+                                    toast.show();
+                                }
+                            }
+                        }
+                    });
+            WorkManager.getInstance(this).enqueue(otwr);
         }
 
     }

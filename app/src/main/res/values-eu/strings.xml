@@ -34,7 +34,7 @@
     <string name="prefEditorial">Editoriala</string>
     <string name="Registro">ERREGISTROA</string>
     <string name="Registro2">Erregistratu</string>
-    <string name="ususuarioContraseña">Erabiltzailea ez da existitzen edo pasahitza okerra da.</string>
+    <string name="ususuarioContraseña">Pasahitza ez da zuzena</string>
     <string name="usuarioContraseña2">Sartutako izena duen erabiltzaile bat existitzen da jada</string>
     <string name="añadir">Gehitu</string>
     <string name="descripcion">Deskribapena:</string>
@@ -42,4 +42,5 @@
     <string name="buscarLibro">LBURUAK BILATU</string>
     <string name="hintBusqueda">Titulua, egilea...</string>
     <string name="previsualizar">IKUSI</string>
+    <string name="usuarioNoExiste">Sartutako erabiltzailea ez da existitzen</string>
 </resources>

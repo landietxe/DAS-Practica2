@@ -34,11 +34,12 @@
     <string name="prefEditorial">Editorial</string>
     <string name="Registro">REGISTRO</string>
     <string name="Registro2">Registrar</string>
-    <string name="ususuarioContraseña">El usuario no existe o la contraseña es incorrecta</string>
+    <string name="ususuarioContraseña">La contraseña no es correcta</string>
     <string name="usuarioContraseña2">Ya existe un usuario con el nombre introducido</string>
     <string name="descripcion">Descripción:</string>
     <string name="errorBusqueda">No se ha podido completar la búsqueda</string>
     <string name="buscarLibro">BUSCAR LIBROS</string>
     <string name="hintBusqueda">Título, autor...</string>
     <string name="previsualizar">VISUALIZAR</string>
+    <string name="usuarioNoExiste">El usuario introducido no existe</string>
 </resources>

@@ -23,10 +23,8 @@ public class miBD extends SQLiteOpenHelper {
         /*Método que se ejecuta cuando hay que crear la BD porque no existe.
         Por un lado, se crean las tablas "Usuarios", "Libro" y "Usurio_Libro" y después
         se añade un usuario de prueba a la tabla Usuarios.*/
-        sqLiteDatabase.execSQL("CREATE TABLE Usuarios ( user_id INTEGER PRIMARY KEY AUTOINCREMENT,username varchar(255) NOT NULL,password varchar(255) NOT NULL);");
         sqLiteDatabase.execSQL("CREATE TABLE Libro ('ISBN' VARCHAR(16) PRIMARY KEY NOT NULL, 'Titulo' VARCHAR(255), 'Autor' VARCHAR(255), 'Editorial' VARCHAR(255), 'Descripción' TEXT(800),'Imagen' VARCHAR(255),'Preview' VARCHAR(255));");
-        sqLiteDatabase.execSQL("CREATE TABLE Usuario_Libro ( user_id INTEGER NOT NULL REFERENCES Usuarios(user_id),ISBN VARCHAR(16) NOT NULL REFERENCES Libro(ISBN), PRIMARY KEY(user_id,ISBN));");
-        sqLiteDatabase.execSQL("INSERT INTO Usuarios(username,password) VALUES ('prueba','123')");
+        sqLiteDatabase.execSQL("CREATE TABLE Usuario_Libro ( user_id INTEGER NOT NULL ,ISBN VARCHAR(16) NOT NULL REFERENCES Libro(ISBN), PRIMARY KEY(user_id,ISBN));");
     }
 
     @Override
@@ -35,10 +33,10 @@ public class miBD extends SQLiteOpenHelper {
 
     public String comprobarLibroUsuario(String ISBN,String user_id){
         /*Método que ejecuta una sentencia SELECT en la base de datos para comprobar si el
-        usuario actual ya tiene el libro indicando mediante el ISBN en su biblioteca. En caso de qeu esté en la base de datos,
+        usuario actual ya tiene el libro indicado mediante el ISBN en su biblioteca. En caso de que esté en la base de datos,
         devuelve su ISBN, en caso contrario devuelve un string vacío.*/
         SQLiteDatabase bd = getWritableDatabase();
-        Cursor c = bd.rawQuery("SELECT * FROM Libro l JOIN Usuario_Libro ul ON l.ISBN = ul.ISBN JOIN Usuarios u ON u.user_id = ul.user_id WHERE u.user_id='"+user_id+"' AND l.ISBN='" + ISBN + "'", null);
+        Cursor c = bd.rawQuery("SELECT * FROM Libro l JOIN Usuario_Libro ul ON l.ISBN = ul.ISBN WHERE ul.user_id='"+user_id+"' AND l.ISBN='" + ISBN + "'", null);
         String respuesta="";
         if(c.moveToNext()){
             respuesta = c.getString(0);
@@ -51,7 +49,7 @@ public class miBD extends SQLiteOpenHelper {
 
     public String comprobarLibro(String ISBN){
         /*Método que ejecuta una sentencia SELECT en la base de datos para comprobar si el
-    libro con el ISBN indicado ya se encuentra en la base de datos. En caso de qeu esté en la base de datos,
+    libro con el ISBN indicado ya se encuentra en la base de datos. En caso de que esté en la base de datos,
     devuelve su ISBN, en caso contrario devuelve un string vacío.*/
         SQLiteDatabase bd = getWritableDatabase();
         Cursor c = bd.rawQuery("SELECT * FROM Libro l WHERE l.ISBN='" + ISBN + "'", null);
@@ -98,7 +96,7 @@ public class miBD extends SQLiteOpenHelper {
         Por cada libro se creará una instancia de la clase "Libro" y se irán añadiendo a un ArrayList para devolverlo al final.*/
         ArrayList<Libro> listalibros = new ArrayList<Libro>();
         SQLiteDatabase bd = getWritableDatabase();
-        Cursor c = bd.rawQuery("SELECT * FROM Libro l JOIN Usuario_Libro ul ON l.ISBN = ul.ISBN JOIN Usuarios u ON u.user_id = ul.user_id WHERE u.user_id='"+user_id+"' ORDER BY l."+orden+" ASC", null);
+        Cursor c = bd.rawQuery("SELECT * FROM Libro l JOIN Usuario_Libro ul ON l.ISBN = ul.ISBN WHERE ul.user_id='"+user_id+"' ORDER BY l."+orden+" ASC", null);
         while (c.moveToNext()){
             String ISBN = c.getString(0);
             String titulo = c.getString(1);
@@ -123,7 +121,7 @@ public class miBD extends SQLiteOpenHelper {
     también se borrará de la tabla "Libro".*/
         SQLiteDatabase bd = getWritableDatabase();
         bd.execSQL("DELETE FROM Usuario_Libro WHERE user_id ='"+user_id+"' AND ISBN='"+ISBN+"'");
-        Cursor c = bd.rawQuery("SELECT * FROM Libro l JOIN Usuario_Libro ul ON l.ISBN = ul.ISBN JOIN Usuarios u ON u.user_id = ul.user_id WHERE l.ISBN='" + ISBN +"'", null);
+        Cursor c = bd.rawQuery("SELECT * FROM Libro l JOIN Usuario_Libro ul ON l.ISBN = ul.ISBN WHERE l.ISBN='" + ISBN +"'", null);
         if (!c.moveToNext()){ //El libro ya no lo tiene ningun usuario, por lo tanto se puede borrar de la base de datos
             this.borrarLibro(ISBN);
         }
@@ -138,29 +136,4 @@ public class miBD extends SQLiteOpenHelper {
         bd.close();
 
     }
-
-    public int getUsuario(String username, String password){
-        /*Método que ejecuta una sentencia SELECT para comprobar si ya existe un usuario
-      en la tabla "Usuarios" con el nombre y contraseña indicados. De ser así,  devuelve el identificador del usuario.
-      En caso contrario devuelve -1;*/
-        SQLiteDatabase bd = getWritableDatabase();
-        int id = -1;
-        Cursor c = bd.rawQuery("SELECT user_id FROM Usuarios WHERE username='"+username+"' AND password='" + password+"';", null);
-        if(c.moveToNext()){
-            id = c.getInt(0);
-        }
-        bd.close();
-        return id;
-    }
-
-    public void insertarUsuario(String user, String password) {
-        /* Método que ejecuta una sentencia INSERT para añadir un nuevo usuario a la
-        tabla "Usuarios" con el nombre y contraseña indicados.*/
-        SQLiteDatabase bd = getWritableDatabase();
-        bd.execSQL("INSERT INTO Usuarios(username,password) VALUES ('"+user+"','"+password+"')");
-        bd.close();
-
-    }
-
-
 }
