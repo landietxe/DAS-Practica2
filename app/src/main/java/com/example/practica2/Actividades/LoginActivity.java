@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.preference.PreferenceManager;
@@ -21,8 +22,13 @@ import androidx.work.WorkManager;
 
 import com.example.practica2.R;
 import com.example.practica2.BD.miBD;
+import com.example.practica2.WorkManager.GuardarTokenFMC;
 import com.example.practica2.WorkManager.InsertarUsuario;
 import com.example.practica2.WorkManager.ObtenerUsuario;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -70,6 +76,51 @@ public class LoginActivity extends AppCompatActivity {
 
         //Obtener la base de datos de la aplicación
         gestorDB = new miBD(this, "Libreria", null, 1);
+
+        //Obtener token del dispositivo
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+                            return;
+                        }
+                        String token = task.getResult().getToken();
+                        guardarToken(token);
+
+                        System.out.println(token);
+                    }
+                });
+    }
+
+
+    /*
+    Método que se ejecuta al abrir la aplicación. Obtiene el token del dispositivo
+    y mediante la clase "GuardarTokenFMC" guarda el token en una base de datos remota en caso de que
+    no se haya añadido anteriormente. Si se añade el nuevo token, se muestra un Toast.
+     */
+    public void guardarToken(String token){
+        Data datos = new Data.Builder()
+                .putString("token",token)
+                .build();
+        System.out.println("GUARDAR TOKEN" + datos.toString());
+        OneTimeWorkRequest otwr = new OneTimeWorkRequest.Builder(GuardarTokenFMC.class).setInputData(datos).build();
+        WorkManager.getInstance(this).getWorkInfoByIdLiveData(otwr.getId())
+                .observe(this, new Observer<WorkInfo>() {
+                    @Override
+                    public void onChanged(WorkInfo workInfo) {
+                        if(workInfo != null && workInfo.getState().isFinished()) {
+                            //Si se ha añadido el token, mostrar un Toast.
+                            if ("SUCCEEDED".equals(workInfo.getState().name())) {
+                                String mensaje = getString(R.string.token);
+                                Toast toast = Toast.makeText(getApplicationContext(), mensaje, Toast.LENGTH_SHORT);
+                                toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+                                toast.show();
+                            }
+                        }
+                    }
+                });
+        WorkManager.getInstance(this).enqueue(otwr);
     }
 
 

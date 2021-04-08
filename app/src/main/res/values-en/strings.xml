@@ -43,4 +43,5 @@
     <string name="hintBusqueda">Title, author...</string>
     <string name="previsualizar">PREVIEW</string>
     <string name="usuarioNoExiste">The user does not exist</string>
+    <string name="token">New token has been added</string>
 </resources>

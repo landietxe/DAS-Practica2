@@ -43,4 +43,5 @@
     <string name="hintBusqueda">Titulua, egilea...</string>
     <string name="previsualizar">IKUSI</string>
     <string name="usuarioNoExiste">Sartutako erabiltzailea ez da existitzen</string>
+    <string name="token">Token berri bat gehitu da</string>
 </resources>

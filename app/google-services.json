@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "254700846941",
+    "project_id": "das-practica2",
+    "storage_bucket": "das-practica2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:254700846941:android:4be7e08f4d671587b072b4",
+        "android_client_info": {
+          "package_name": "com.example.practica2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "254700846941-kdonj5kdk0t8b9m77pn109dpnc6fadm0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJAFFZ28YiY27jirBp6MCLuFqHn2sF41E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "254700846941-kdonj5kdk0t8b9m77pn109dpnc6fadm0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -42,4 +42,5 @@
     <string name="hintBusqueda">Título, autor...</string>
     <string name="previsualizar">VISUALIZAR</string>
     <string name="usuarioNoExiste">El usuario introducido no existe</string>
+    <string name="token">Se ha añadido un token</string>
 </resources>
