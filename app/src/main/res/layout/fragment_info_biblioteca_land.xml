@@ -132,7 +132,7 @@
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.241"
+        app:layout_constraintHorizontal_bias="0.092"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
@@ -148,6 +148,22 @@
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.097"
         app:layout_constraintStart_toEndOf="@+id/button" />
+
+    <Button
+        android:id="@+id/botonCompartir"
+        style="@style/boton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="15dp"
+        android:layout_weight="0.5"
+        android:background="@drawable/boton"
+        android:text="@string/compartir"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.319"
+        app:layout_constraintStart_toEndOf="@+id/botonPreview" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

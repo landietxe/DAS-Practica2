@@ -98,7 +98,7 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
         int orientation = getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_LANDSCAPE){ //Pantalla en horizontal, usamos el otro fragment
             fragmentInfoLibroBibliotecaLand elotro=(fragmentInfoLibroBibliotecaLand) getSupportFragmentManager().findFragmentById(R.id.fragment4);
-            elotro.actualizar(isbn,title,autores,editorial,descripcion,previewLink);
+            elotro.actualizar(isbn,title,autores,editorial,descripcion,previewLink,thumbnail);
 
         }
         else{ //Pantalla en vertical, abrimos nueva actividad

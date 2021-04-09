@@ -3,7 +3,12 @@ package com.example.practica2.Actividades;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.Observer;
 import androidx.preference.PreferenceManager;
+import androidx.work.Data;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -24,11 +29,18 @@ import android.widget.Toast;
 import com.example.practica2.Dialogos.DialogoConfirmarBorrar;
 import com.example.practica2.R;
 import com.example.practica2.BD.miBD;
+import com.example.practica2.WorkManager.CompartirLibroFMC;
+import com.example.practica2.WorkManager.ObtenerTokens;
 import com.squareup.picasso.Picasso;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 /*Actividad que muestra la información de un libro seleccionado desde el recyclerview de la clase "MainAcitvityBiblioteca" que
  contiene los libros añadidos por el usuario. La actividad permite borrar el libro de la biblioteca del usuario o ver su previsualización.
@@ -54,6 +66,7 @@ public class InfoLibroBiblioteca extends AppCompatActivity implements DialogoCon
     private String urlImagen;
     private String preview;
     private String user_id;
+    private String user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,8 +124,15 @@ public class InfoLibroBiblioteca extends AppCompatActivity implements DialogoCon
 
             //Cargar la imagen
             Picasso.get().load(imagen.replace("http", "https")).into(this.imagen);
-
-
+        }
+        try {//Obtener nombre del Usuario
+            BufferedReader ficherointerno = new BufferedReader(new InputStreamReader(openFileInput("usuario_actual.txt")));
+            ficherointerno.readLine();
+            String linea = ficherointerno.readLine();
+            this.user= linea.split(":")[1];
+            ficherointerno.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -207,6 +227,63 @@ public class InfoLibroBiblioteca extends AppCompatActivity implements DialogoCon
         Este método abre un intent implícito que muestra en el navegador una previsualización del libro.*/
         Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(this.preview));
         startActivity(i);
+    }
+
+    public void onClickCompartir(View v){
+        String titulo = this.titulo;
+        String autor = this.autor;
+        String urlimagen = this.urlImagen;
+        String user=this.user;
+        String descripcion =this.descripcion;
+
+        OneTimeWorkRequest otwr = new OneTimeWorkRequest.Builder(ObtenerTokens.class).build();
+
+        WorkManager.getInstance(this).getWorkInfoByIdLiveData(otwr.getId())
+                .observe(this, new Observer<WorkInfo>() {
+                    @Override
+                    public void onChanged(WorkInfo workInfo) {
+                        if (workInfo != null && workInfo.getState().isFinished()) {
+                            try {
+                                //Obtener los datos del resultado de la conexión asincrona ejecuta desde la clase conexionBDWebService
+                                JSONArray jsonArray = new JSONArray(workInfo.getOutputData().getString("resultados"));
+                                List<String> lista = new ArrayList<String>();
+                                for(int i = 0; i < jsonArray.length(); i++)
+                                {
+                                    String token = jsonArray.getString(i);
+                                    lista.add(token);
+                                }
+                                enviarNotificacion(lista.toArray(new String[0]),titulo,autor,urlimagen,user,descripcion);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                });
+        WorkManager.getInstance(this).enqueue(otwr);
+    }
+    public void enviarNotificacion(String[] lista,String titulo,String autor,String urlimagen,String user,String descripcion){
+        Data datos = new Data.Builder()
+                .putString("titulo",titulo)
+                .putString("autor",autor)
+                .putString("urlimagen",urlimagen)
+                .putString("user",user)
+                .putString("descripcion",descripcion)
+                .putStringArray("tokens",lista)
+                .build();
+
+        OneTimeWorkRequest otwr = new OneTimeWorkRequest.Builder(CompartirLibroFMC.class).
+                setInputData(datos)
+                .build();
+        WorkManager.getInstance(this).getWorkInfoByIdLiveData(otwr.getId())
+                .observe(this, new Observer<WorkInfo>() {
+                    @Override
+                    public void onChanged(WorkInfo workInfo) {
+                        if(workInfo != null && workInfo.getState().isFinished()){
+                            Toast.makeText(getApplicationContext(),"Libro compartido",Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+        WorkManager.getInstance(this).enqueue(otwr);
     }
 
 }

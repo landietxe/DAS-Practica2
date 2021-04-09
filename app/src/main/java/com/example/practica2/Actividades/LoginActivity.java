@@ -87,8 +87,6 @@ public class LoginActivity extends AppCompatActivity {
                         }
                         String token = task.getResult().getToken();
                         guardarToken(token);
-
-                        System.out.println(token);
                     }
                 });
     }
@@ -103,7 +101,6 @@ public class LoginActivity extends AppCompatActivity {
         Data datos = new Data.Builder()
                 .putString("token",token)
                 .build();
-        System.out.println("GUARDAR TOKEN" + datos.toString());
         OneTimeWorkRequest otwr = new OneTimeWorkRequest.Builder(GuardarTokenFMC.class).setInputData(datos).build();
         WorkManager.getInstance(this).getWorkInfoByIdLiveData(otwr.getId())
                 .observe(this, new Observer<WorkInfo>() {
@@ -134,8 +131,6 @@ public class LoginActivity extends AppCompatActivity {
 
         String user = usuario.getText().toString();
         String password = contraseña.getText().toString();
-        System.out.println(user);
-        System.out.println(password);
         if(user != null && password != null) {
             Data datos = new Data.Builder()
                     .putString("username", user)
@@ -185,7 +180,6 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(intent);
     }
     public void login (String id,String user){
-        System.out.println("id del usuario : " + id);
         try {
             //Escribir en fichero externo el identificador y nombre del usuario
             OutputStreamWriter fichero = new OutputStreamWriter(openFileOutput("usuario_actual.txt", Context.MODE_PRIVATE));

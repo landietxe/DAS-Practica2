@@ -44,4 +44,9 @@
     <string name="previsualizar">PREVIEW</string>
     <string name="usuarioNoExiste">The user does not exist</string>
     <string name="token">New token has been added</string>
+    <string name="compartir">SHARE</string>
+    <string name="libroRecomendado">RECOMMENDED BOOK</string>
+    <string name="recomendarLibro">wants to recommend a book:</string>
+    <string name="notificacionLibroCompartido">Book shared</string>
+    <string name="notificacionLibroCompartido2">Book has been shared to all tokens</string>
 </resources>

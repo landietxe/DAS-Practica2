@@ -43,4 +43,9 @@
     <string name="previsualizar">VISUALIZAR</string>
     <string name="usuarioNoExiste">El usuario introducido no existe</string>
     <string name="token">Se ha añadido un token</string>
+    <string name="compartir">COMPARTIR</string>
+    <string name="libroRecomendado">LIBRO RECOMENDADO</string>
+    <string name="recomendarLibro">quiere recomendar un libro:</string>
+    <string name="notificacionLibroCompartido">Libro Compartido</string>
+    <string name="notificacionLibroCompartido2">Se ha compartido un libro a todos los tokens</string>
 </resources>

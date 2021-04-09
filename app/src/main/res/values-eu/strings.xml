@@ -44,4 +44,9 @@
     <string name="previsualizar">IKUSI</string>
     <string name="usuarioNoExiste">Sartutako erabiltzailea ez da existitzen</string>
     <string name="token">Token berri bat gehitu da</string>
+    <string name="compartir">PARTEKATU</string>
+    <string name="libroRecomendado">GOMENDATUTAKO LIBURUA</string>
+    <string name="recomendarLibro">erabltzaileak liburu bat gomendatu nahi du:</string>
+    <string name="notificacionLibroCompartido">Liburua partekatuta</string>
+    <string name="notificacionLibroCompartido2">Liburua partekatu zaie token guztiei</string>
 </resources>
