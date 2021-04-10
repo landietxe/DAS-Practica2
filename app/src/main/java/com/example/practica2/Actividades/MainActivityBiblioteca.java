@@ -1,16 +1,21 @@
 package com.example.practica2.Actividades;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.preference.PreferenceManager;
 
+import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Build;
@@ -133,6 +138,15 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
                 startActivity(intent);
 
             }
+            case R.id.opcion3:{//Boton Ajustes,abrirá la actividad "PreferenciasActivity"
+
+                if(pedirPermisoLocalizacion()){
+                    Intent intent = new Intent(this, GoogleMaps.class);
+                    startActivity(intent);
+                }
+
+
+            }
 
         }
         return super.onOptionsItemSelected(item);
@@ -235,5 +249,47 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
         newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(newIntent);
         finish();
+    }
+
+    public boolean pedirPermisoLocalizacion(){
+
+        //PEDIR PERMISOS
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            //EL PERMISO NO ESTÁ CONCEDIDO, PEDIRLO
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                // MOSTRAR AL USUARIO UNA EXPLICACIÓN DE POR QUÉ ES NECESARIO EL PERMISO
+
+            } else {
+                //EL PERMISO NO ESTÁ CONCEDIDO TODAVÍA O EL USUARIO HA INDICADO
+                //QUE NO QUIERE QUE SE LE VUELVA A SOLICITAR
+            }
+            //PEDIR EL PERMISO
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
+
+        } else {//EL PERMISO ESTÁ CONCEDIDO, EJECUTAR LA FUNCIONALIDAD
+            return true;
+
+        }
+        return false;
+
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode){
+            case 0:{
+                // Si la petición se cancela, granResults estará vacío
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // PERMISO CONCEDIDO, EJECUTAR LA FUNCIONALIDAD
+                    Intent intent = new Intent(this, GoogleMaps.class);
+                    startActivity(intent);
+
+                }
+                else {// PERMISO DENEGADO, DESHABILITAR LA FUNCIONALIDAD O EJECUTAR ALTERNATIVA
+                }
+                return;
+            }
+        }
     }
 }
