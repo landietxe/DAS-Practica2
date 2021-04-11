@@ -128,7 +128,14 @@ public class fragmentBiblioteca extends Fragment {
             //Asigna a los atributos del ViewHolder los valores a mostrar para una posición concreta
             Libro libro = listaLibros.get(position);
             String url = libro.getThumbnail().replace("http", "https");
-            Picasso.get().load(url).into(holder.laimagen);
+
+            if(url.equals("")){
+                holder.laimagen.setImageResource(R.drawable.no_cover);
+            }
+            else{
+                //Cargar la imagen
+                Picasso.get().load(url).into(holder.laimagen);
+            }
 
             //Listener para gestionar la interacción con una elemento del recyclerview
             holder.itemView.setOnClickListener(new View.OnClickListener() {

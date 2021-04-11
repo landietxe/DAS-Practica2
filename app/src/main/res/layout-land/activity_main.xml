@@ -54,4 +54,18 @@
         app:layout_constraintStart_toEndOf="@+id/editTextLibro"
         app:layout_constraintTop_toBottomOf="@+id/textView4" />
 
+    <Button
+        android:id="@+id/botonEscanear"
+        style="@style/boton"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/boton"
+        android:onClick="onClickEscanear"
+        android:text="@string/escanear"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.416"
+        app:layout_constraintStart_toEndOf="@+id/botonBuscar2"
+        app:layout_constraintTop_toBottomOf="@+id/textView4" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

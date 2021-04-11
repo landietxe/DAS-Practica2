@@ -49,4 +49,10 @@
     <string name="recomendarLibro">wants to recommend a book:</string>
     <string name="notificacionLibroCompartido">Book shared</string>
     <string name="notificacionLibroCompartido2">Book has been shared to all tokens</string>
+    <string name="escanear">SCAN</string>
+    <string name="errorEscaneo">No book could be found</string>
+    <string name="escanearLibro">Scan book</string>
+    <string name="escanearModo">Select from where you want to get an image that shows the barcode of the book</string>
+    <string name="escanearGaleria">Gallery</string>
+    <string name="escanearFoto">Photo</string>
 </resources>

@@ -122,8 +122,14 @@ public class InfoLibroBiblioteca extends AppCompatActivity implements DialogoCon
             this.tvEditorial.setText(editorial);
             this.tvDescripcion.setText(descripcion);
 
-            //Cargar la imagen
-            Picasso.get().load(imagen.replace("http", "https")).into(this.imagen);
+
+            if(imagen.equals("")){
+                this.imagen.setImageResource(R.drawable.no_cover);
+            }
+            else{
+                //Cargar la imagen
+                Picasso.get().load(imagen.replace("http", "https")).into(this.imagen);
+            }
         }
         try {//Obtener nombre del Usuario
             BufferedReader ficherointerno = new BufferedReader(new InputStreamReader(openFileInput("usuario_actual.txt")));

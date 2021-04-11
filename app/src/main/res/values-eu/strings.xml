@@ -49,4 +49,10 @@
     <string name="recomendarLibro">erabltzaileak liburu bat gomendatu nahi du:</string>
     <string name="notificacionLibroCompartido">Liburua partekatuta</string>
     <string name="notificacionLibroCompartido2">Liburua partekatu zaie token guztiei</string>
+    <string name="escanear">ESKANEATU</string>
+    <string name="errorEscaneo">Ez da libururik aurkitu</string>
+    <string name="escanearLibro">Liburua eskaneatu</string>
+    <string name="escanearModo">Aukeratu liburuaren barra kodea agertzen den irudia nondik lortu nahi duzun</string>
+    <string name="escanearGaleria">Bilduma</string>
+    <string name="escanearFoto">Argazkia</string>
 </resources>

@@ -48,4 +48,10 @@
     <string name="recomendarLibro">quiere recomendar un libro:</string>
     <string name="notificacionLibroCompartido">Libro Compartido</string>
     <string name="notificacionLibroCompartido2">Se ha compartido un libro a todos los tokens</string>
+    <string name="escanear">ESCANEAR</string>
+    <string name="errorEscaneo">No se ha podido encontrar ningún libro</string>
+    <string name="escanearLibro">Escanear Libro</string>
+    <string name="escanearModo">Selecciona de donde quieres obtener una imagen que muestre el código de barras del libro</string>
+    <string name="escanearGaleria">Galeria</string>
+    <string name="escanearFoto">Foto</string>
 </resources>

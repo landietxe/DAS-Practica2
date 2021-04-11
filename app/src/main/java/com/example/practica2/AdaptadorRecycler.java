@@ -50,7 +50,14 @@ public class AdaptadorRecycler extends RecyclerView.Adapter<ViewHolder>  {
         /*Cargar la imagen utilizando la libreria Picasso
         Obtenido de https://guides.codepath.com/android/Displaying-Images-with-the-Picasso-Library : "Loading an Image from Url"*/
         String url = libro.getThumbnail().replace("http", "https");
-        Picasso.get().load(url).into(holder.laimagen);
+
+        if(url.equals("")){
+            holder.laimagen.setImageResource(R.drawable.no_cover);
+        }
+        else{
+            Picasso.get().load(url).into(holder.laimagen);
+        }
+
 
         //Listener para gestionar la interacción con una fila del recyclerview
         holder.itemView.setOnClickListener(new View.OnClickListener() {

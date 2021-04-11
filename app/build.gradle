@@ -46,4 +46,5 @@ dependencies {
             { exclude group: 'junit', module: 'junit'}
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
     implementation 'com.google.android.gms:play-services-location:18.0.0'
+    implementation 'com.google.mlkit:barcode-scanning:16.1.1'
 }

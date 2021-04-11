@@ -57,7 +57,13 @@ public class LibroCompartido extends AppCompatActivity {
             tvdescripcion.setText(descripcion);
 
             imagen = (ImageView) findViewById(R.id.imageView);
-            Picasso.get().load(urlimagen.replace("http", "https")).into(this.imagen);
+            if(urlimagen.equals("")){
+                this.imagen.setImageResource(R.drawable.no_cover);
+            }
+            else{
+                //Cargar la imagen
+                Picasso.get().load(urlimagen.replace("http", "https")).into(this.imagen);
+            }
         }
     }
 }

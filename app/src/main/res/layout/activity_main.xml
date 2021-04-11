@@ -20,16 +20,30 @@
         app:layout_constraintStart_toEndOf="@+id/editTextLibro"
         app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
+    <Button
+        android:id="@+id/botonEscanear"
+        style="@style/boton"
+        android:layout_width="99dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/boton"
+        android:onClick="onClickEscanear"
+        android:text="@string/escanear"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.504"
+        app:layout_constraintStart_toEndOf="@+id/editTextLibro"
+        app:layout_constraintTop_toBottomOf="@+id/botonBuscar" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerview"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextLibro"
+        app:layout_constraintTop_toBottomOf="@+id/botonEscanear"
         app:layout_constraintVertical_bias="0.086" />
 
     <EditText
