@@ -1,7 +1,10 @@
 package com.example.practica2.Actividades;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.Observer;
 import androidx.preference.PreferenceManager;
@@ -10,16 +13,23 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
+import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
@@ -27,6 +37,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.practica2.Dialogos.DialogoConfirmarBorrar;
+import com.example.practica2.Dialogos.DialogoImagen;
 import com.example.practica2.R;
 import com.example.practica2.BD.miBD;
 import com.example.practica2.WorkManager.CompartirLibroFMC;
@@ -37,15 +48,18 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 /*Actividad que muestra la información de un libro seleccionado desde el recyclerview de la clase "MainAcitvityBiblioteca" que
  contiene los libros añadidos por el usuario. La actividad permite borrar el libro de la biblioteca del usuario o ver su previsualización.
  */
-public class InfoLibroBiblioteca extends AppCompatActivity implements DialogoConfirmarBorrar.ListenerdelDialogo {
+public class InfoLibroBiblioteca extends AppCompatActivity implements DialogoConfirmarBorrar.ListenerdelDialogo,DialogoImagen.ListenerdelDialogo {
 
     //Elementos del layout
     private TextView tvTitulo;
@@ -67,6 +81,10 @@ public class InfoLibroBiblioteca extends AppCompatActivity implements DialogoCon
     private String preview;
     private String user_id;
     private String user;
+
+    private Uri uriimagen = null;
+    private String imageName;
+    private File fichImg = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -291,5 +309,148 @@ public class InfoLibroBiblioteca extends AppCompatActivity implements DialogoCon
                 });
         WorkManager.getInstance(this).enqueue(otwr);
     }
+    public void onClickCambiarFoto(View v){
+        if(comprobarPermisos()) {
+            String titulo = getString(R.string.cambiarPortada);
+            String texto = getString(R.string.cambiarPortada2);
+            DialogFragment dialogoImagen = new DialogoImagen(titulo, texto);
+            dialogoImagen.show(getSupportFragmentManager(), "etiqueta");
+        }
 
+    }
+
+
+    @Override
+    public void alpulsarObtenerDeGaleria() {
+        Intent elIntentGal = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(elIntentGal, 10);
+
+
+    }
+
+    @Override
+    public void alpulsarSacarFoto() {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        String nombrefich = "IMG_" + timeStamp + "_";
+        File directorio=this.getFilesDir();
+
+        try {
+            fichImg = File.createTempFile(nombrefich, ".jpg",directorio);
+            uriimagen = FileProvider.getUriForFile(this, "com.example.practica2.provider", fichImg);
+        } catch (IOException e) {
+        }
+        Intent elIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        elIntent.putExtra(MediaStore.EXTRA_OUTPUT, uriimagen);
+        Log.i("etiqueta","start for result");
+        startActivityForResult(elIntent, 11);
+
+    }
+
+    public  Bitmap reescalarImagen() throws IOException {
+
+        Bitmap bitmapFoto= MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(),uriimagen);
+
+        int anchoDestino = imagen.getWidth();
+        int altoDestino = imagen.getHeight();
+        int anchoImagen = bitmapFoto.getWidth();
+        int altoImagen = bitmapFoto.getHeight();
+        float ratioImagen = (float) anchoImagen / (float) altoImagen;
+        float ratioDestino = (float) anchoDestino / (float) altoDestino;
+        int anchoFinal = anchoDestino;
+        int altoFinal = altoDestino;
+        if (ratioDestino > ratioImagen) {
+            anchoFinal = (int) ((float)altoDestino * ratioImagen);
+        } else {
+            altoFinal = (int) ((float)anchoDestino / ratioImagen);
+        }
+        Bitmap bitmapredimensionado = Bitmap.createScaledBitmap(bitmapFoto,anchoFinal,altoFinal,true);
+
+        ExifInterface exif = new ExifInterface(uriimagen.getPath());
+        int rotation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+        int rotationInDegrees = exifToDegrees(rotation);
+
+        Matrix matrix = new Matrix();
+        if (rotation != 0f) {
+            matrix.preRotate(rotationInDegrees);
+        }
+
+        Bitmap rotatedBitmap = Bitmap.createBitmap(bitmapredimensionado, 0, 0, bitmapredimensionado.getWidth(), bitmapredimensionado.getHeight(), matrix, true);
+
+
+        return rotatedBitmap;
+    }
+    private static int exifToDegrees(int exifOrientation) {
+        if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) { return 90; }
+        else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) {  return 180; }
+        else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) {  return 270; }
+        return 0;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 10 && resultCode == RESULT_OK) { //Foto de galeria
+            uriimagen = data.getData();
+            imagen.setImageURI(uriimagen);
+
+            boolean deleted = false;
+            try {
+                deleted = fichImg.delete();
+            } catch (SecurityException e) {
+            }
+            if (!deleted) {
+                fichImg.deleteOnExit();
+            }
+
+        }
+        if (requestCode == 11 && resultCode == RESULT_OK) { //Foto tomada con teléfono
+
+            Log.i("etiqueta","escanear");
+            try {
+                Bitmap bitmap = reescalarImagen();
+                imagen.setImageBitmap(bitmap);
+
+                boolean deleted = false;
+                try {
+                    deleted = fichImg.delete();
+                } catch (SecurityException e) {
+                }
+                if (!deleted) {
+                    fichImg.deleteOnExit();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+
+
+
+    public boolean comprobarPermisos(){
+
+        String [] permisos = new String[]{
+                Manifest.permission.CAMERA,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            //EL PERMISO NO ESTÁ CONCEDIDO, PEDIRLO
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+                // MOSTRAR AL USUARIO UNA EXPLICACIÓN DE POR QUÉ ES NECESARIO EL PERMISO
+
+            } else {
+                //EL PERMISO NO ESTÁ CONCEDIDO TODAVÍA O EL USUARIO HA INDICADO
+                //QUE NO QUIERE QUE SE LE VUELVA A SOLICITAR
+            }
+            //PEDIR Permisos
+            ActivityCompat.requestPermissions(this, permisos,
+                    0);
+
+        } else {
+            //EL PERMISO ESTÁ CONCEDIDO, EJECUTAR LA FUNCIONALIDAD
+            return true;
+        }
+        return false;
+    }
 }

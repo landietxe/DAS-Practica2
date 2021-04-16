@@ -24,7 +24,6 @@ import com.example.practica2.R;
 import com.example.practica2.BD.miBD;
 import com.example.practica2.WorkManager.CompartirLibroFMC;
 import com.example.practica2.WorkManager.ObtenerTokens;
-import com.google.android.gms.common.util.JsonUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -89,7 +88,7 @@ public class fragmentInfoLibroBibliotecaLand extends Fragment{
         TextView editorial = (TextView) getActivity().findViewById(R.id.info_libro_editorial);
         TextView descripcion = (TextView) getActivity().findViewById(R.id.info_libro_descripcion);
         Button botonPreview = (Button) getActivity().findViewById(R.id.botonPreview);
-        Button boton = (Button)getActivity().findViewById(R.id.button);
+        Button boton = (Button)getActivity().findViewById(R.id.boton);
         Button botonCompartir = (Button) getActivity().findViewById(R.id.botonCompartir);
 
         TextView tvTitulo = (TextView) getActivity().findViewById(R.id.tvTitulo);

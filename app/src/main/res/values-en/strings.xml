@@ -55,4 +55,10 @@
     <string name="escanearModo">Select from where you want to get an image that shows the barcode of the book</string>
     <string name="escanearGaleria">Gallery</string>
     <string name="escanearFoto">Photo</string>
+    <string name="cambiarPortada">Change image</string>
+    <string name="cambiarPortada2">Select from where you want to get  a new image for the book</string>
+    <string name="noLibrerias">No nearby bookstores were found</string>
+    <string name="ubicacionDesconocida">Unknown location</string>
+    <string name="libreriasEncontradas">bookstores found</string>
+    <string name="libreria">Bookstores</string>
 </resources>

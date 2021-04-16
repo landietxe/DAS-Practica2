@@ -55,4 +55,10 @@
     <string name="escanearModo">Aukeratu liburuaren barra kodea agertzen den irudia nondik lortu nahi duzun</string>
     <string name="escanearGaleria">Bilduma</string>
     <string name="escanearFoto">Argazkia</string>
+    <string name="cambiarPortada">Argazkia aldatu</string>
+    <string name="cambiarPortada2">Aukeratu nondik lortu liburuaren argazki berri</string>
+    <string name="noLibrerias">Ez da liburutegirik aurkitu</string>
+    <string name="ubicacionDesconocida">Kokapen ezezaguna</string>
+    <string name="libreriasEncontradas">liburutegi aurkitu dira</string>
+    <string name="libreria">Liburu dendak</string>
 </resources>

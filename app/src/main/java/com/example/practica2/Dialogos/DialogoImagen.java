@@ -13,11 +13,17 @@ import com.example.practica2.R;
 
 public class DialogoImagen extends DialogFragment {
     DialogoImagen.ListenerdelDialogo miListener;
+    private String titulo;
+    private String texto;
     /*Interfaz del diálogo para que las acciones se ejecuten
     en la actividad que llamó al dialogo*/
     public interface ListenerdelDialogo {
         void alpulsarSacarFoto();
         void alpulsarObtenerDeGaleria();
+    }
+    public DialogoImagen(String titulo,String texto){
+        this.titulo=titulo;
+        this.texto=texto;
     }
     @NonNull
     @Override
@@ -26,8 +32,6 @@ public class DialogoImagen extends DialogFragment {
         miListener =(DialogoImagen.ListenerdelDialogo) getActivity();
 
         //Obtener string según el idioma para el texto del dialog
-        String titulo = getString(R.string.escanearLibro);
-        String texto= getString(R.string.escanearModo);
         String galeria = getString(R.string.escanearGaleria);
         String foto = getString(R.string.escanearFoto);
         //Crear  un AlertDialog con el estilo "AlertDialogCustom"

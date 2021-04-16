@@ -54,4 +54,10 @@
     <string name="escanearModo">Selecciona de donde quieres obtener una imagen que muestre el código de barras del libro</string>
     <string name="escanearGaleria">Galeria</string>
     <string name="escanearFoto">Foto</string>
+    <string name="cambiarPortada">Cambiar Imagen</string>
+    <string name="cambiarPortada2">Selecciona de donde obtener una nueva imagen para el libro</string>
+    <string name="noLibrerias">No se han encontrado librerías cercanas</string>
+    <string name="ubicacionDesconocida">Ubicación desconocida</string>
+    <string name="libreriasEncontradas">librerías encontradas</string>
+    <string name="libreria">Tiendas de libros</string>
 </resources>

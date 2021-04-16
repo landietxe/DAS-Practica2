@@ -224,7 +224,9 @@ public class MainActivity extends AppCompatActivity implements DialogoImagen.Lis
         //Si dispone de permisos, pide al usuario seleccionar la imagen del código de barras de la galeria o sacar
         //una foto nueva
         if(comprobarPermisos()) {
-            DialogFragment dialogoImagen= new DialogoImagen();
+            String titulo = getString(R.string.escanearLibro);
+            String texto= getString(R.string.escanearModo);
+            DialogFragment dialogoImagen= new DialogoImagen(titulo,texto);
             dialogoImagen.show(getSupportFragmentManager(), "etiqueta");
         }
 
@@ -350,7 +352,7 @@ public class MainActivity extends AppCompatActivity implements DialogoImagen.Lis
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
                 ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             //EL PERMISO NO ESTÁ CONCEDIDO, PEDIRLO
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)){
                 // MOSTRAR AL USUARIO UNA EXPLICACIÓN DE POR QUÉ ES NECESARIO EL PERMISO
 
             } else {

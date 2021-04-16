@@ -136,16 +136,15 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
             case R.id.opcion2:{//Boton Ajustes,abrirá la actividad "PreferenciasActivity"
                 Intent intent = new Intent(this, PreferenciasActivity.class);
                 startActivity(intent);
+                return true;
 
             }
             case R.id.opcion3:{//Boton Ajustes,abrirá la actividad "PreferenciasActivity"
-
                 if(pedirPermisoLocalizacion()){
                     Intent intent = new Intent(this, GoogleMaps.class);
                     startActivity(intent);
                 }
-
-
+                return true;
             }
 
         }

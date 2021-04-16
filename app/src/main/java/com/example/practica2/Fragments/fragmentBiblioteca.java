@@ -137,11 +137,11 @@ public class fragmentBiblioteca extends Fragment {
                 Picasso.get().load(url).into(holder.laimagen);
             }
 
-            //Listener para gestionar la interacción con una elemento del recyclerview
+            //Listener para gestionar la interacción con un elemento del recyclerview
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    /*Método que se ejecuta cuando se pulsa en una elemento del recyclerview. Este método
+                    /*Método que se ejecuta cuando se pulsa en un elemento del recyclerview. Este método
                     asigna el método "seleccionarElemento" del listener.*/
                     elListener.seleccionarElemento(libro.getISBN(),libro.getTitle(),libro.getAutores(),libro.getEditorial(),libro.getDescripcion(),libro.getThumbnail(),libro.getPreviewLink());
                 }
