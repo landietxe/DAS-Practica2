@@ -322,12 +322,14 @@ public class MainActivity extends AppCompatActivity implements DialogoImagen.Lis
                                 Toast.makeText(MainActivity.this, R.string.errorEscaneo, Toast.LENGTH_SHORT).show();
                             }
                             boolean deleted = false;
-                            try {
-                                deleted = fichImg.delete();
-                            } catch (SecurityException e) {
-                            }
-                            if (!deleted) {
-                                fichImg.deleteOnExit();
+                            if(fichImg!=null) {
+                                try {
+                                    deleted = fichImg.delete();
+                                } catch (SecurityException e) {
+                                }
+                                if (!deleted) {
+                                    fichImg.deleteOnExit();
+                                }
                             }
                         }
                     })

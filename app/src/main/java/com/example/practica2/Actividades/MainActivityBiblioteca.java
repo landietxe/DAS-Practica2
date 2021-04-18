@@ -6,8 +6,14 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.Observer;
 import androidx.preference.PreferenceManager;
+import androidx.work.Data;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
 
 import android.Manifest;
 import android.app.NotificationChannel;
@@ -17,30 +23,44 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 
 import com.example.practica2.Dialogos.DialogoConfirmarBorrar;
+import com.example.practica2.Dialogos.DialogoImagen;
 import com.example.practica2.Fragments.fragmentBiblioteca;
 import com.example.practica2.Fragments.fragmentInfoLibroBibliotecaLand;
 import com.example.practica2.R;
 import com.example.practica2.BD.miBD;
+import com.example.practica2.WorkManager.GuardarImagenLibro;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
 /*Actividad que muestra los libros que el usuario tenga añadidos en su biblioteca. Esta actividad está compuesta de fragments
 * para tener un comportamiento diferente según la orientación en la que se encuentre el móvil*/
 public class MainActivityBiblioteca extends AppCompatActivity implements fragmentBiblioteca.listenerDelFragment,fragmentInfoLibroBibliotecaLand.listener2,
-        DialogoConfirmarBorrar.ListenerdelDialogo{
+        DialogoConfirmarBorrar.ListenerdelDialogo,DialogoImagen.ListenerdelDialogo{
 
     private String ISBN;
     private miBD gestorDB;
@@ -48,6 +68,16 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
     private String ordenLibros;
     private Toolbar toolbar;
     private String nombreUsuario="";
+
+    private ImageView imageView;
+    private int numClicks=0;
+    private String isbnClick="";
+    private Uri uriimagen = null;
+    private String imageName;
+    private File fichImg = null;
+    private boolean imagenCambiado;
+    private Bitmap bitmapImagen;
+    private boolean imagenSubiendo=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,17 +124,28 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
     }
 
     @Override
-    public void seleccionarElemento(String isbn, String title, String autores, String editorial, String descripcion, String thumbnail, String previewLink) {
+    public void seleccionarElemento(String isbn, String title, String autores, String editorial, String descripcion, String thumbnail, String previewLink, ImageView imageview) {
         /*Método que se ejecuta cuando el usuario selecciona uno de sus libros. Por un lado se comprueba la orientación en la que
         se encuentra el móvil. Si el móvil está en vertical, se abrirá la actividad "InfoLibroBiblioteca" pasandole los datos del libro.
         Si el móvil está en horizontal, ya existe otro fragment en el layout, por lo que se hace cast a su clase y se llama al método
         "actualizar" para visualizar los datos.*/
         this.ISBN=isbn;
+        this.imageView=imageview;
         int orientation = getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_LANDSCAPE){ //Pantalla en horizontal, usamos el otro fragment
-            fragmentInfoLibroBibliotecaLand elotro=(fragmentInfoLibroBibliotecaLand) getSupportFragmentManager().findFragmentById(R.id.fragment4);
-            elotro.actualizar(isbn,title,autores,editorial,descripcion,previewLink,thumbnail);
-
+            if(this.ISBN.equals(isbnClick)){//Ha vuelto a click-ar en la misma imagen, abrimos diálogo para cambiar la imagen.
+                if(comprobarPermisos()) {
+                    String titulo = getString(R.string.cambiarPortada);
+                    String texto = getString(R.string.cambiarPortada2);
+                    DialogFragment dialogoImagen = new DialogoImagen(titulo, texto);
+                    dialogoImagen.show(getSupportFragmentManager(), "etiqueta");
+                }
+            }
+            else{
+                isbnClick=this.ISBN;
+                fragmentInfoLibroBibliotecaLand elotro=(fragmentInfoLibroBibliotecaLand) getSupportFragmentManager().findFragmentById(R.id.fragment4);
+                elotro.actualizar(isbn,title,autores,editorial,descripcion,previewLink,thumbnail);
+            }
         }
         else{ //Pantalla en vertical, abrimos nueva actividad
             Intent i= new Intent(this,InfoLibroBiblioteca.class);
@@ -290,5 +331,188 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
                 return;
             }
         }
+    }
+    @Override
+    public void alpulsarObtenerDeGaleria() {
+        Intent elIntentGal = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(elIntentGal, 10);
+    }
+
+    @Override
+    public void alpulsarSacarFoto() {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        String nombrefich = "IMG_" + timeStamp + "_";
+        File directorio=this.getFilesDir();
+
+        try {
+            fichImg = File.createTempFile(nombrefich, ".jpg",directorio);
+            uriimagen = FileProvider.getUriForFile(this, "com.example.practica2.provider", fichImg);
+        } catch (IOException e) {
+        }
+        Intent elIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        elIntent.putExtra(MediaStore.EXTRA_OUTPUT, uriimagen);
+        startActivityForResult(elIntent, 11);
+
+    }
+
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 10 && resultCode == RESULT_OK) { //Foto de galeria
+            uriimagen = data.getData();
+            imageName = uriimagen.toString().split("%2F")[uriimagen.toString().split("%2F").length - 1];
+            guardarImagen();
+        }
+        if (requestCode == 11 && resultCode == RESULT_OK) { //Foto tomada con teléfono
+            imageName = uriimagen.toString().split("/")[uriimagen.toString().split("/").length - 1];
+            guardarImagen();
+        }
+    }
+
+    public void guardarImagen() {
+        try {
+            bitmapImagen = reescalarImagen();
+            this.imageView.setRotation(90);
+            this.imageView.setImageBitmap(bitmapImagen);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //Obtener identificador del usuario actual
+        try {
+            BufferedReader ficherointerno = new BufferedReader(new InputStreamReader(openFileInput("usuario_actual.txt")));
+            String linea = ficherointerno.readLine();
+            this.user_id = linea.split(":")[1]; //id:num
+            ficherointerno.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        //Subir imagen a Firebase
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageRef = storage.getReference();
+        StorageReference spaceRef = storageRef.child(imageName);
+        UploadTask uploadTask = spaceRef.putFile(uriimagen);
+        String texto = getString(R.string.guardandoImagen);
+        Toast.makeText(getApplicationContext(), texto, Toast.LENGTH_SHORT).show();
+        try {
+            Thread.sleep(6000); // Delay para que se suba la foto a Firebase y se pueda cargar correctamente
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle unsuccessful uploads
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                imagenSubiendo = false;
+                guardarEnBD();
+            }
+        });
+    }
+    public void guardarEnBD(){
+        //Subir nombre de la imagen a la BD remota
+        Data datos = new Data.Builder()
+                .putString("user_id",user_id)
+                .putString("isbn",ISBN)
+                .putString("nombreImagen",imageName)
+                .putBoolean("imagenCambiado",imagenCambiado)
+                .build();
+
+        OneTimeWorkRequest otwr = new OneTimeWorkRequest.Builder(GuardarImagenLibro.class).
+                setInputData(datos)
+                .build();
+        WorkManager.getInstance(this).getWorkInfoByIdLiveData(otwr.getId())
+                .observe(this, new Observer<WorkInfo>() {
+                    @Override
+                    public void onChanged(WorkInfo workInfo) {
+                        if(workInfo != null && workInfo.getState().isFinished()){
+                            String texto = getString(R.string.imagenGuardada);
+                            Toast.makeText(getApplicationContext(),texto,Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+        WorkManager.getInstance(this).enqueue(otwr);
+
+        //Borrar fichero temporal
+        boolean deleted = false;
+        if(fichImg!=null) {
+            try {
+                deleted = fichImg.delete();
+            } catch (SecurityException e) {
+            }
+            if (!deleted) {
+                fichImg.deleteOnExit();
+            }
+        }
+    }
+
+    public Bitmap reescalarImagen() throws IOException {
+
+        Bitmap bitmapFoto = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uriimagen);
+        int anchoDestino = this.imageView.getWidth();
+        int altoDestino = this.imageView.getHeight();
+        int anchoImagen = bitmapFoto.getWidth();
+        int altoImagen = bitmapFoto.getHeight();
+        float ratioImagen = (float) anchoImagen / (float) altoImagen;
+        float ratioDestino = (float) anchoDestino / (float) altoDestino;
+        int anchoFinal = anchoDestino;
+        int altoFinal = altoDestino;
+        if (ratioDestino > ratioImagen) {
+            anchoFinal = (int) ((float) altoDestino * ratioImagen);
+        } else {
+            altoFinal = (int) ((float) anchoDestino / ratioImagen);
+        }
+        Bitmap bitmapredimensionado = Bitmap.createScaledBitmap(bitmapFoto, anchoFinal, altoFinal, true);
+
+        return bitmapredimensionado;
+    }
+
+    public boolean comprobarPermisos(){
+
+        String [] permisos = new String[]{
+                Manifest.permission.CAMERA,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            //EL PERMISO NO ESTÁ CONCEDIDO, PEDIRLO
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+                // MOSTRAR AL USUARIO UNA EXPLICACIÓN DE POR QUÉ ES NECESARIO EL PERMISO
+
+            } else {
+                //EL PERMISO NO ESTÁ CONCEDIDO TODAVÍA O EL USUARIO HA INDICADO
+                //QUE NO QUIERE QUE SE LE VUELVA A SOLICITAR
+            }
+            //PEDIR Permisos
+            ActivityCompat.requestPermissions(this, permisos,
+                    0);
+
+        } else {
+            //EL PERMISO ESTÁ CONCEDIDO, EJECUTAR LA FUNCIONALIDAD
+            return true;
+        }
+        return false;
+    }
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable("file_uri", uriimagen);
+    }
+
+    /*
+     * Here we restore the fileUri again
+     */
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        uriimagen = savedInstanceState.getParcelable("file_uri");
     }
 }

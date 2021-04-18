@@ -59,9 +59,6 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
-import com.google.android.libraries.places.api.net.PlacesClient;
-import com.google.gson.JsonObject;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -73,7 +70,6 @@ import java.util.Map;
 
 public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback {
     private LatLng ubicacionActual;
-    private PlacesClient placesClient;
     private RequestQueue requestQueue;
     private Marker userMarker;
     private LatLng ultimaUbicacion;
@@ -96,10 +92,6 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback {
 
         Context context = getBaseContext().createConfigurationContext(configuration);
         getBaseContext().getResources().updateConfiguration(configuration, context.getResources().getDisplayMetrics());
-
-
-
-
 
         setContentView(R.layout.activity_google_maps);
 

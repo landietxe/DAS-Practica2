@@ -2,24 +2,40 @@ package com.example.practica2.Fragments;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.work.Data;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
 
+import com.bumptech.glide.Glide;
 import com.example.practica2.Libro;
 import com.example.practica2.R;
 import com.example.practica2.ViewHolder.ViewHolderBiblioteca;
 import com.example.practica2.BD.miBD;
+import com.example.practica2.WorkManager.ObtenerImagenLibro;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
+
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -46,7 +62,7 @@ public class fragmentBiblioteca extends Fragment {
 
     //Interfaz con el método del listener para la comunicación con el fragment definido en la actividad "MainActivityBiblioteca"
     public interface listenerDelFragment{
-        void seleccionarElemento(String isbn, String title, String autores, String editorial, String descripcion, String thumbnail, String previewLink);
+        void seleccionarElemento(String isbn, String title, String autores, String editorial, String descripcion, String thumbnail, String previewLink, ImageView imagen);
     }
 
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -127,15 +143,57 @@ public class fragmentBiblioteca extends Fragment {
         public void onBindViewHolder(@NonNull ViewHolderBiblioteca holder, int position) {
             //Asigna a los atributos del ViewHolder los valores a mostrar para una posición concreta
             Libro libro = listaLibros.get(position);
+            String ISBN = libro.getISBN();
             String url = libro.getThumbnail().replace("http", "https");
 
-            if(url.equals("")){
-                holder.laimagen.setImageResource(R.drawable.no_cover);
-            }
-            else{
-                //Cargar la imagen
-                Picasso.get().load(url).into(holder.laimagen);
-            }
+            Data datos = new Data.Builder()
+                    .putString("user_id", user_id)
+                    .putString("isbn", ISBN)
+                    .build();
+            OneTimeWorkRequest otwr = new OneTimeWorkRequest.Builder(ObtenerImagenLibro.class).setInputData(datos).build();
+            WorkManager.getInstance(getContext()).getWorkInfoByIdLiveData(otwr.getId())
+                    .observe(getViewLifecycleOwner(), new Observer<WorkInfo>() {
+                        @Override
+                        public void onChanged(WorkInfo workInfo) {
+                            boolean imagenCambiado=false;
+                            if (workInfo != null && workInfo.getState().isFinished()) {
+                                //Obtener los datos del resultado de la conexión asincrona ejecuta desde la clase conexionBDWebService
+                                String result = workInfo.getOutputData().getString("resultados");
+                                JSONParser parser = new JSONParser();
+                                JSONObject json = null;
+                                try {
+                                    json = (JSONObject) parser.parse(result);
+                                    String nombreImagen = (String) json.get("nombreImagen");
+                                    if(nombreImagen!=null){
+                                        imagenCambiado=true;
+                                        FirebaseStorage storage = FirebaseStorage.getInstance();
+                                        StorageReference storageRef = storage.getReference();
+                                        StorageReference pathReference = storageRef.child(nombreImagen);
+                                        pathReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                            @Override
+                                            public void onSuccess(Uri uri) {
+                                                Glide.with(getContext()).load(uri).into(holder.laimagen);
+                                            }
+                                        });
+                                    }
+                                } catch (ParseException parseException) {
+                                    parseException.printStackTrace();
+                                }
+                                if(!imagenCambiado) { //Si la imagen no ha sido cambiada por el usuario, se carga la original
+                                    if(url.equals("")){
+                                        holder.laimagen.setImageResource(R.drawable.no_cover);
+                                    }
+                                    else{
+                                        //Cargar la imagen
+                                        Glide.with(getContext()).load(url).into(holder.laimagen);
+                                    }
+                                }
+                            }
+                        }
+
+                    });
+            WorkManager.getInstance(getContext()).enqueue(otwr);
+
 
             //Listener para gestionar la interacción con un elemento del recyclerview
             holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -143,7 +201,7 @@ public class fragmentBiblioteca extends Fragment {
                 public void onClick(View v) {
                     /*Método que se ejecuta cuando se pulsa en un elemento del recyclerview. Este método
                     asigna el método "seleccionarElemento" del listener.*/
-                    elListener.seleccionarElemento(libro.getISBN(),libro.getTitle(),libro.getAutores(),libro.getEditorial(),libro.getDescripcion(),libro.getThumbnail(),libro.getPreviewLink());
+                    elListener.seleccionarElemento(libro.getISBN(),libro.getTitle(),libro.getAutores(),libro.getEditorial(),libro.getDescripcion(),libro.getThumbnail(),libro.getPreviewLink(),holder.laimagen);
                 }
             });
             }

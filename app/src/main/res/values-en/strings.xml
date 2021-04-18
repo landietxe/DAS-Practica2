@@ -61,4 +61,6 @@
     <string name="ubicacionDesconocida">Unknown location</string>
     <string name="libreriasEncontradas">bookstores found</string>
     <string name="libreria">Bookstores</string>
+    <string name="imagenGuardada">Image of the book has been saved</string>
+    <string name="guardandoImagen">Saving image...</string>
 </resources>

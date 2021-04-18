@@ -61,4 +61,6 @@
     <string name="ubicacionDesconocida">Kokapen ezezaguna</string>
     <string name="libreriasEncontradas">liburutegi aurkitu dira</string>
     <string name="libreria">Liburu dendak</string>
+    <string name="imagenGuardada">Liburuaren argazkia gorde da</string>
+    <string name="guardandoImagen">Argazkia gordetzen...</string>
 </resources>

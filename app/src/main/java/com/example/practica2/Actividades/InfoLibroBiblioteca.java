@@ -1,5 +1,6 @@
 package com.example.practica2.Actividades;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
@@ -36,21 +37,34 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.practica2.Dialogos.DialogoConfirmarBorrar;
 import com.example.practica2.Dialogos.DialogoImagen;
 import com.example.practica2.R;
 import com.example.practica2.BD.miBD;
 import com.example.practica2.WorkManager.CompartirLibroFMC;
+import com.example.practica2.WorkManager.GuardarImagenLibro;
+import com.example.practica2.WorkManager.ObtenerImagenLibro;
 import com.example.practica2.WorkManager.ObtenerTokens;
+import com.example.practica2.WorkManager.ObtenerUsuario;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.sql.SQLOutput;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -67,6 +81,7 @@ public class InfoLibroBiblioteca extends AppCompatActivity implements DialogoCon
     private TextView tvEditorial;
     private TextView tvDescripcion;
     private ImageView imagen;
+    private Bitmap bitmapImagen;
 
     //Base de datos
     private miBD gestorDB;
@@ -85,10 +100,14 @@ public class InfoLibroBiblioteca extends AppCompatActivity implements DialogoCon
     private Uri uriimagen = null;
     private String imageName;
     private File fichImg = null;
+    private boolean imagenCambiado;
+    private boolean imagenSubiendo=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        imagenCambiado=false;
 
         //Obtener preferencias de idioma para actualizar los elementos del layout según el idioma
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -116,6 +135,20 @@ public class InfoLibroBiblioteca extends AppCompatActivity implements DialogoCon
         tvDescripcion = (TextView) findViewById(R.id.info_libro_descripcion);
         imagen = (ImageView) findViewById(R.id.info_libro_imagen);
 
+
+        try {//Obtener nombre  y identificador del Usuario
+            BufferedReader ficherointerno = new BufferedReader(new InputStreamReader(openFileInput("usuario_actual.txt")));
+            // ficherointerno.readLine();
+            String linea = ficherointerno.readLine();
+            this.user_id= linea.split(":")[1];
+            linea = ficherointerno.readLine();
+            this.user= linea.split(":")[1];
+            ficherointerno.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
         //Obtener información pasada desde la actividad anterior
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
@@ -124,7 +157,7 @@ public class InfoLibroBiblioteca extends AppCompatActivity implements DialogoCon
             String autor = extras.getString("autor");
             String editorial = extras.getString("editorial");
             String descripcion = extras.getString("descripcion");
-            String imagen = extras.getString("imagen");
+            String urlimagen = extras.getString("imagen");
             String preview = extras.getString("previewlink");
 
             this.ISBN = isbn;
@@ -132,7 +165,7 @@ public class InfoLibroBiblioteca extends AppCompatActivity implements DialogoCon
             this.autor = autor;
             this.editorial = editorial;
             this.descripcion = descripcion;
-            this.urlImagen = imagen;
+            this.urlImagen = urlimagen;
             this.preview = preview;
 
             this.tvTitulo.setText(titulo);
@@ -141,23 +174,54 @@ public class InfoLibroBiblioteca extends AppCompatActivity implements DialogoCon
             this.tvDescripcion.setText(descripcion);
 
 
-            if(imagen.equals("")){
-                this.imagen.setImageResource(R.drawable.no_cover);
-            }
-            else{
-                //Cargar la imagen
-                Picasso.get().load(imagen.replace("http", "https")).into(this.imagen);
-            }
+            Data datos = new Data.Builder()
+                    .putString("user_id", user_id)
+                    .putString("isbn", ISBN)
+                    .build();
+            OneTimeWorkRequest otwr = new OneTimeWorkRequest.Builder(ObtenerImagenLibro.class).setInputData(datos).build();
+            WorkManager.getInstance(this).getWorkInfoByIdLiveData(otwr.getId())
+            .observe(this, new Observer<WorkInfo>() {
+                @Override
+                public void onChanged(WorkInfo workInfo) {
+                    if (workInfo != null && workInfo.getState().isFinished()) {
+                        //Obtener los datos del resultado de la conexión asincrona ejecuta desde la clase conexionBDWebService
+                        String result = workInfo.getOutputData().getString("resultados");
+                        JSONParser parser = new JSONParser();
+                        JSONObject json = null;
+                        try {
+                            json = (JSONObject) parser.parse(result);
+                            String nombreImagen = (String) json.get("nombreImagen");
+                            if(nombreImagen!=null){
+                                imagenCambiado=true;
+                                FirebaseStorage storage = FirebaseStorage.getInstance();
+                                StorageReference storageRef = storage.getReference();
+                                StorageReference pathReference = storageRef.child(nombreImagen);
+                                pathReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                    @Override
+                                    public void onSuccess(Uri uri) {
+                                        Glide.with(getApplicationContext()).load(uri).into(imagen);
+                                    }
+                                });
+                            }
+                        } catch (ParseException parseException) {
+                            parseException.printStackTrace();
+                        }
+                        if(!imagenCambiado) { //Si la imagen no ha sido cambiada por el usuario, se carga la original
+                            if (urlimagen.equals("")) {
+                                imagen.setImageResource(R.drawable.no_cover);
+                            } else {
+                                //Cargar la imagen original
+                                Glide.with(getApplicationContext()).load(urlimagen.replace("http","https")).into(imagen);
+                            }
+                        }
+                    }
+                }
+
+            });
+            WorkManager.getInstance(this).enqueue(otwr);
+
         }
-        try {//Obtener nombre del Usuario
-            BufferedReader ficherointerno = new BufferedReader(new InputStreamReader(openFileInput("usuario_actual.txt")));
-            ficherointerno.readLine();
-            String linea = ficherointerno.readLine();
-            this.user= linea.split(":")[1];
-            ficherointerno.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
     }
 
     public void onClickBorrar(View v){
@@ -173,16 +237,6 @@ public class InfoLibroBiblioteca extends AppCompatActivity implements DialogoCon
         de su biblioteca. Por un lado, se lee del fichero "usuario_actual.txt" cual es el identificador del usuario actual. Con ese identificador,
         se llama al método "borrarUsuarioLibro" de la base de datos para quitar el libro al usuario. Después se abre una notificación
         indicando que el libro ha sido borrado. Por último, se vuelve a abrir la actividad "MainActivityBiblioteca".*/
-
-        //Obtener identificador del usuario actual
-        try {
-            BufferedReader ficherointerno = new BufferedReader(new InputStreamReader(openFileInput("usuario_actual.txt")));
-            String linea = ficherointerno.readLine();
-            this.user_id= linea.split(":")[1]; //id:num
-            ficherointerno.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
         //Quitar libro a usuario
         gestorDB.borrarUsuarioLibro(this.ISBN,this.user_id);
@@ -235,15 +289,17 @@ public class InfoLibroBiblioteca extends AppCompatActivity implements DialogoCon
 
     }
     @Override
-    public void onBackPressed(){
+    public void onBackPressed() {
         /*Método que se ejecuta cuando el usuario pulsa el bóton del móvil para volver hacia atras.
           El método abrirá la actividad anterior a la actual, en este caso, MainActivityBiblioteca y finalizará la
           actividad actual.*/
-        Context context = getApplicationContext();
-        Intent newIntent = new Intent(context, MainActivityBiblioteca.class);
-        newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(newIntent);
-        finish();
+        if (!imagenSubiendo) {
+            Context context = getApplicationContext();
+            Intent newIntent = new Intent(context, MainActivityBiblioteca.class);
+            newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(newIntent);
+            finish();
+        }
     }
 
     public void onClickPreview(View v){
@@ -261,7 +317,6 @@ public class InfoLibroBiblioteca extends AppCompatActivity implements DialogoCon
         String descripcion =this.descripcion;
 
         OneTimeWorkRequest otwr = new OneTimeWorkRequest.Builder(ObtenerTokens.class).build();
-
         WorkManager.getInstance(this).getWorkInfoByIdLiveData(otwr.getId())
                 .observe(this, new Observer<WorkInfo>() {
                     @Override
@@ -341,15 +396,108 @@ public class InfoLibroBiblioteca extends AppCompatActivity implements DialogoCon
         }
         Intent elIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         elIntent.putExtra(MediaStore.EXTRA_OUTPUT, uriimagen);
-        Log.i("etiqueta","start for result");
         startActivityForResult(elIntent, 11);
 
     }
 
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 10 && resultCode == RESULT_OK) { //Foto de galeria
+            uriimagen = data.getData();
+            imageName=uriimagen.toString().split("%2F")[uriimagen.toString().split("%2F").length-1];
+            guardarImagen();
+        }
+        if (requestCode == 11 && resultCode == RESULT_OK) { //Foto tomada con teléfono
+            imageName=uriimagen.toString().split("/")[uriimagen.toString().split("/").length-1];
+            guardarImagen();
+        }
+
+
+    }
+
+    public void guardarImagen(){
+        try {
+            bitmapImagen = reescalarImagen();
+            imagen.setRotation(90);
+            imagen.setImageBitmap(bitmapImagen);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //Subir imagen a Firebase
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageRef = storage.getReference();
+        StorageReference spaceRef = storageRef.child(imageName);
+
+        imagenSubiendo=true;
+        String texto = getString(R.string.guardandoImagen);
+        Toast.makeText(getApplicationContext(),texto,Toast.LENGTH_SHORT).show();
+        UploadTask uploadTask = spaceRef.putFile(uriimagen);
+        try {
+            Thread.sleep(6000); // Delay para que se suba la foto a Firebase y se pueda cargar correctamente
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle unsuccessful uploads
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                imagenSubiendo=false;
+                guardarEnBD();
+            }
+        });
+
+    }
+    public void guardarEnBD(){
+        //Subir nombre de la imagen a la BD remota
+        Data datos = new Data.Builder()
+                .putString("user_id",user_id)
+                .putString("isbn",ISBN)
+                .putString("nombreImagen",imageName)
+                .putBoolean("imagenCambiado",imagenCambiado)
+                .build();
+
+        OneTimeWorkRequest otwr = new OneTimeWorkRequest.Builder(GuardarImagenLibro.class).
+                setInputData(datos)
+                .build();
+        WorkManager.getInstance(this).getWorkInfoByIdLiveData(otwr.getId())
+                .observe(this, new Observer<WorkInfo>() {
+                    @Override
+                    public void onChanged(WorkInfo workInfo) {
+                        if(workInfo != null && workInfo.getState().isFinished()){
+                            String texto = getString(R.string.imagenGuardada);
+                            Toast.makeText(getApplicationContext(),texto,Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+        WorkManager.getInstance(this).enqueue(otwr);
+
+
+
+        //Borrar fichero temporal
+        boolean deleted = false;
+        if(fichImg!=null) {
+            try {
+                deleted = fichImg.delete();
+            } catch (SecurityException e) {
+            }
+            if (!deleted) {
+                fichImg.deleteOnExit();
+            }
+        }
+    }
     public  Bitmap reescalarImagen() throws IOException {
 
-        Bitmap bitmapFoto= MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(),uriimagen);
-
+        Bitmap bitmapFoto = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uriimagen);
         int anchoDestino = imagen.getWidth();
         int altoDestino = imagen.getHeight();
         int anchoImagen = bitmapFoto.getWidth();
@@ -359,71 +507,13 @@ public class InfoLibroBiblioteca extends AppCompatActivity implements DialogoCon
         int anchoFinal = anchoDestino;
         int altoFinal = altoDestino;
         if (ratioDestino > ratioImagen) {
-            anchoFinal = (int) ((float)altoDestino * ratioImagen);
+            anchoFinal = (int) ((float) altoDestino * ratioImagen);
         } else {
-            altoFinal = (int) ((float)anchoDestino / ratioImagen);
+            altoFinal = (int) ((float) anchoDestino / ratioImagen);
         }
-        Bitmap bitmapredimensionado = Bitmap.createScaledBitmap(bitmapFoto,anchoFinal,altoFinal,true);
+        Bitmap bitmapredimensionado = Bitmap.createScaledBitmap(bitmapFoto, anchoFinal, altoFinal, true);
 
-        ExifInterface exif = new ExifInterface(uriimagen.getPath());
-        int rotation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-        int rotationInDegrees = exifToDegrees(rotation);
-
-        Matrix matrix = new Matrix();
-        if (rotation != 0f) {
-            matrix.preRotate(rotationInDegrees);
-        }
-
-        Bitmap rotatedBitmap = Bitmap.createBitmap(bitmapredimensionado, 0, 0, bitmapredimensionado.getWidth(), bitmapredimensionado.getHeight(), matrix, true);
-
-
-        return rotatedBitmap;
-    }
-    private static int exifToDegrees(int exifOrientation) {
-        if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) { return 90; }
-        else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) {  return 180; }
-        else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) {  return 270; }
-        return 0;
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == 10 && resultCode == RESULT_OK) { //Foto de galeria
-            uriimagen = data.getData();
-            imagen.setImageURI(uriimagen);
-
-            boolean deleted = false;
-            try {
-                deleted = fichImg.delete();
-            } catch (SecurityException e) {
-            }
-            if (!deleted) {
-                fichImg.deleteOnExit();
-            }
-
-        }
-        if (requestCode == 11 && resultCode == RESULT_OK) { //Foto tomada con teléfono
-
-            Log.i("etiqueta","escanear");
-            try {
-                Bitmap bitmap = reescalarImagen();
-                imagen.setImageBitmap(bitmap);
-
-                boolean deleted = false;
-                try {
-                    deleted = fichImg.delete();
-                } catch (SecurityException e) {
-                }
-                if (!deleted) {
-                    fichImg.deleteOnExit();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        }
+        return bitmapredimensionado;
     }
 
 
@@ -452,5 +542,40 @@ public class InfoLibroBiblioteca extends AppCompatActivity implements DialogoCon
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode){
+            case 0:{
+                // Si la petición se cancela, granResults estará vacío
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // PERMISO CONCEDIDO, EJECUTAR LA FUNCIONALIDAD
+                    String titulo = getString(R.string.cambiarPortada);
+                    String texto = getString(R.string.cambiarPortada2);
+                    DialogFragment dialogoImagen = new DialogoImagen(titulo, texto);
+                    dialogoImagen.show(getSupportFragmentManager(), "etiqueta");
+                }
+                else {// PERMISO DENEGADO, DESHABILITAR LA FUNCIONALIDAD O EJECUTAR ALTERNATIVA
+                }
+                return;
+            }
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        //Método que guarda la uri de la imagen
+        super.onSaveInstanceState(outState);
+        outState.putParcelable("file_uri", uriimagen);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        //Método que recupera la uri de la imagen
+        uriimagen = savedInstanceState.getParcelable("file_uri");
     }
 }

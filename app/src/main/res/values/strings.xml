@@ -60,4 +60,6 @@
     <string name="ubicacionDesconocida">Ubicación desconocida</string>
     <string name="libreriasEncontradas">librerías encontradas</string>
     <string name="libreria">Tiendas de libros</string>
+    <string name="imagenGuardada">Se ha guardado la imagen del libro</string>
+    <string name="guardandoImagen">Guardando imagen...</string>
 </resources>
