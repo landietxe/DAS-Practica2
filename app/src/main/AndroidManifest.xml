@@ -5,10 +5,13 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-feature android:name="android.hardware.camera2.full" android:required="true"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <uses-feature
+        android:name="android.hardware.camera2.full"
+        android:required="true" />
 
     <application
         android:icon="@mipmap/ic_launcher"
@@ -16,7 +19,24 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/TemaDAS"
         android:usesCleartextTraffic="true">
-        <activity android:name=".Actividades.GoogleMaps"></activity>
+        <receiver android:name=".Widget.AlarmManagerBroadcastRecevier"/>
+        <receiver android:name=".Widget.Widget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.example.Practica2.ACTUALIZAR_WIDGET" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_info" />
+        </receiver>
+        <activity android:name=".Widget.WidgetConfigureActivity">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".Actividades.GoogleMaps" />
         <activity android:name=".Actividades.LibroCompartido">
             <intent-filter>
                 <action android:name="MENSAJE" />
@@ -48,15 +68,14 @@
         </service>
 
         <provider
-            android:authorities="com.example.practica2.provider"
             android:name="androidx.core.content.FileProvider"
+            android:authorities="com.example.practica2.provider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/configalmacen"/>
+                android:resource="@xml/configalmacen" />
         </provider>
-
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

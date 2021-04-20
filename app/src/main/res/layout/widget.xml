@@ -1,0 +1,64 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/widget_background"
+    android:orientation="vertical"
+    android:padding="@dimen/widget_margin"
+    android:theme="@style/ThemeOverlay.Practica2.AppWidgetContainer">
+
+
+    <TextView
+        android:id="@+id/tituloWidget"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:fontFamily="casual"
+        android:text="RECOMENDACIÓN LIBROS"
+        android:textAlignment="center"
+        android:textColor="#000000"
+        android:textSize="17sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/categoria"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:fontFamily="casual"
+        android:text="TextView"
+        android:textAlignment="center"
+        android:textColor="#000000" />
+
+    <TextView
+        android:id="@+id/titulo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:fontFamily="casual"
+        android:text="TextView"
+        android:textAlignment="center"
+        android:textColor="#000000" />
+
+
+
+    <TextView
+        android:id="@+id/autor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:fontFamily="casual"
+        android:text="TextView"
+        android:textAlignment="center"
+        android:textColor="#000000" />
+
+
+    <Button
+        android:id="@+id/elboton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Siguiente" />
+
+
+</LinearLayout>

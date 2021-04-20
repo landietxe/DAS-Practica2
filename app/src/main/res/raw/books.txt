@@ -1,0 +1,54 @@
+Categoria: Ficción;Título: The Midnight Library;Autor: Matt Haig
+Categoria: Ciencia Ficción;Título: Dormir en un mar de estrellas;Autor: Christopher Paolini
+Categoria: Horror;Título: Mexican Gothic;Autora: Silvia Moreno-García
+Categoria: Fantasía;Título: Casa de tierra y sangre ;Autora: Sarah Maas
+Categoria: Fantasía;Título: La vida invisible ;Autora: Addie LaRue
+Categoria: Fantasía;Título: El ritmo de la guerra ;Autor: Brandon Sanderson
+Categoria: Ciencia Ficción;Título: Harrow the Ninth;Autora: Tamsyn Muir
+Categoria: Ficción;Título: Tierra americana;Autora: Jeanine Cummins
+Categoria: Ficción;Título: El hotel de cristal;Autora: Emily St. John Mandel
+Categoria: Ficción;Título: In an Instant;Autora: Suzanne Redfearn
+Categoria: Ficción;Título: Mi sombría Vanessa;Autora: Kate Elizabeth Russell
+Categoria: Ficción;Título: Real Life;Autor: Brandon Taylor
+Categoria: Ficción;Título: The Death of Vivek Oji;Autora: Akwaeke Emezi
+Categoria: Misterio y thriller;Título: La lista de invitados;Autora: Lucy Foley
+Categoria: Misterio y thriller;Título: Home Before Dark;Autor: Riley Sager
+Categoria: Misterio y thriller;Título: One by One;Autora: Ruth Ware
+Categoria: Misterio y thriller;Título: The Night Swim;Autora: Megan Goldin
+Categoria: Misterio y thriller;Título: Winter Counts;Autor: David Heska Wanbli Weiden
+Categoria: Misterio y thriller;Título: Long Bright River;Autora: Liz Moore
+Categoria: Misterio y thriller;Título: The Devil and the Dark Water;Autor: Stuart Turton
+Categoria: Fantasía;Título: The House in the Cerulean Sea;Autor: TJ Klune
+Categoria: Fantasía;Título: Black Sun ;Autora: Rebecca Roanhorse
+Categoria: Fantasía;Título: The Trouble with Peace;Autor: Joe Abercrombie
+Categoria: Fantasía;Título: Age of Empyre ;Autor: Michael J. Sullivan
+Categoria: Romance;Título: From Blood and Ash ;Autora: Jennifer L Armentrout
+Categoria: Romance;Título: Beach Read ;Autora: Emily Henry
+Categoria: Romance;Título: In Five Years;Autora: Rebecca Serle
+Categoria: Romance;Título: Regretting You ;Autora: Colleen Hoover
+Categoria: Romance;Título: Boyfriend Material ;Autor: Alexis Hall
+Categoria: Romance;Título: Take a Hint, Dani Brown;Autora: Talia Hibbert
+Categoria: Romance;Título: One to Watch;Autora: Kate Stayman-London
+Categoria: Ciencia Ficción;Título: Network Effect;Autora: Martha Wells
+Categoria: Ciencia Ficción;Título: The Space Between Worlds;Autores: Micaiah Johnson, J. Conrad
+Categoria: Ciencia Ficción;Título: The Hidden Girl and Other Stories;Autor: Ken Liu
+Categoria: Ciencia Ficción;Título: The Last Emperox;Autor: John Scalzi
+Categoria: Ciencia Ficción;Título: The Book of Koli;Autor: Mike Carey
+Categoria: Ciencia Ficción;Título: Age of Deception;Autor: T. A. White
+Categoria: Horror;Título: The Southern Book Club's Guide to Slaying Vampires;Autor: Grady Hendrix
+Categoria: Horror;Título: La sangre manda;Autor: Stephen King
+Categoria: Horror;Título: The Year of the Witching;Autora: Alexis Henderson
+Categoria: Horror;Título: The Only Good Indians;Autor: Stephen Graham Jones
+Categoria: Horror;Título: The Hollow Places;Autora: Ursula Vernon
+Categoria: Horror;Título: Los seres huecos;Autores: Chuck Hogan, Guillermo del Toro
+Categoria: Humor;Título: Strange Planet;Autor: Nathan W. Pyle
+Categoria: Humor;Título: You're Doing Great!: And Other Reasons to Stay Alive;Autor: Tom Papa
+Categoria: Humor;Título: Overstated: A Coast-To-Coast Roast of the 50 States;Autor: Colin Quinn
+Categoria: Humor;Título: A Very Punchable Face;Autor: Colin Jost
+Categoria: Humor;Título: Solutions and Other Problems;Autora: Allie Brosh
+Categoria: Humor;Título: Wow, No Thank You;Autora: Samantha Irby
+Categoria: Humor;Título: Shakespeare for Squirrels;Autor: Christopher Moore
+
+
+
+

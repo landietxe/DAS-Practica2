@@ -62,4 +62,7 @@
     <string name="libreria">Tiendas de libros</string>
     <string name="imagenGuardada">Se ha guardado la imagen del libro</string>
     <string name="guardandoImagen">Guardando imagen...</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+    <string name="configure">Configure</string>
 </resources>
