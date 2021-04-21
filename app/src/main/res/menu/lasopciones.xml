@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+    <item android:title="@string/usuario"
+        android:id="@+id/user">
+        <menu>
+            <item
+                android:id="@+id/logout"
+                android:icon="@drawable/exit"
+                android:title="Logout" />
+        </menu>
+    </item>
+    <item
+        android:id="@+id/mapa"
+        android:icon="@drawable/map_icon"
+        android:title="@string/libreria" />
+</menu>

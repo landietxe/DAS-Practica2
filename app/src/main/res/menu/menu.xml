@@ -12,8 +12,4 @@
         android:id="@+id/opcion2"
         android:title="@string/ajustes"
         app:showAsAction="never" />
-    <item
-        android:id="@+id/opcion3"
-        android:title="@string/libreria"
-        app:showAsAction="never" />
 </menu>

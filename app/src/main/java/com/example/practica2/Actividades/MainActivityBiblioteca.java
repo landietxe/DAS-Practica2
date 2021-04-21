@@ -7,6 +7,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.Observer;
 import androidx.preference.PreferenceManager;
@@ -32,7 +34,9 @@ import android.provider.MediaStore;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -45,6 +49,7 @@ import com.example.practica2.BD.miBD;
 import com.example.practica2.WorkManager.GuardarImagenLibro;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -79,6 +84,7 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
     private Bitmap bitmapImagen;
     private boolean imagenSubiendo=false;
 
+    DrawerLayout elmenudesplegable;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -117,6 +123,41 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(this.nombreUsuario);
         setSupportActionBar(toolbar);
+
+        //Añdir menu desplegable al layout
+        elmenudesplegable = findViewById(R.id.drawer);
+        //System.out.println(elmenudesplegable.toString());
+        NavigationView elnavigation = findViewById(R.id.elnavigationview);
+        elnavigation.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+           @Override
+           public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+               switch (item.getItemId()){
+                   case R.id.mapa:
+                       if(pedirPermisoLocalizacion()){
+                           Intent intent = new Intent(getApplicationContext(), GoogleMaps.class);
+                           startActivity(intent);
+                       }
+                       break;
+                   case R.id.logout:
+                       Context context = getApplicationContext();
+                       Intent newIntent = new Intent(context, LoginActivity.class);
+                       newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                       context.startActivity(newIntent);
+                       finish();
+               }
+               elmenudesplegable.closeDrawers();
+               return false;
+           }
+       });
+        getSupportActionBar().setHomeAsUpIndicator(android.R.drawable.ic_dialog_info);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        // get menu from navigationView
+        Menu menu = elnavigation.getMenu();
+        // find MenuItem you want to change
+        MenuItem nav_user = menu.findItem(R.id.user);
+        nav_user.setTitle(nav_user.getTitle().toString() +": " + nombreUsuario);
+
 
         //Obtener la base de datos de la aplicación
         gestorDB = new miBD(this, "Libreria", null, 1);
@@ -178,16 +219,11 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
                 Intent intent = new Intent(this, PreferenciasActivity.class);
                 startActivity(intent);
                 return true;
-
             }
-            case R.id.opcion3:{//Boton Ajustes,abrirá la actividad "PreferenciasActivity"
-                if(pedirPermisoLocalizacion()){
-                    Intent intent = new Intent(this, GoogleMaps.class);
-                    startActivity(intent);
-                }
+            //Botón de información, abre el menu desplegable.
+            case android.R.id.home:
+                elmenudesplegable.openDrawer(GravityCompat.START);
                 return true;
-            }
-
         }
         return super.onOptionsItemSelected(item);
     }
@@ -281,17 +317,25 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
 
     @Override
     public void onBackPressed(){
-        /*Método que se ejecuta cuando el usuario pulsa el bóton del móvil para volver hacia atras.
-          El método abrirá la actividad anterior a la actual, en este caso, "LoginActivity" y finalizará la
+        /*Método que se ejecuta cuando el usuario pulsa el bóton del móvil para volver hacia atras. Si el menu desplegable está abierto,
+        lo cierra. En caso contrario, el método abrirá la actividad anterior a la actual, en este caso, "LoginActivity" y finalizará la
           actividad actual.*/
-        Context context = getApplicationContext();
-        Intent newIntent = new Intent(context, LoginActivity.class);
-        newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(newIntent);
-        finish();
+
+        //Si el menu desplegable está abierto, lo cierra
+        if (elmenudesplegable.isDrawerOpen(GravityCompat.START)) {
+            elmenudesplegable.closeDrawer(GravityCompat.START);
+        } else {
+            Context context = getApplicationContext();
+            Intent newIntent = new Intent(context, LoginActivity.class);
+            newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(newIntent);
+            finish();
+        }
     }
 
     public boolean pedirPermisoLocalizacion(){
+
+        //Método que comprueba si la aplicación tiene el permiso "ACESS_FINE_LOCATION"
 
         //PEDIR PERMISOS
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -332,6 +376,7 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
             }
         }
     }
+
     @Override
     public void alpulsarObtenerDeGaleria() {
         Intent elIntentGal = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -507,9 +552,7 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
         outState.putParcelable("file_uri", uriimagen);
     }
 
-    /*
-     * Here we restore the fileUri again
-     */
+
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);

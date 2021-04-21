@@ -98,11 +98,15 @@ public class Widget extends AppWidgetProvider {
         // Enter relevant functionality for when the first widget is created
         Intent intent = new Intent(context, AlarmManagerBroadcastRecevier.class);
         pi = PendingIntent.getBroadcast(context, 7475, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+ 1000 * 3, 60000 , pi);
+        am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+ 10000, 10000 , pi);
     }
 
     @Override
     public void onDisabled(Context context) {
+
+        Intent intent = new Intent(context, AlarmManagerBroadcastRecevier.class);
+        PendingIntent pi = PendingIntent.getBroadcast(context, 7475, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager am = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         am.cancel(pi);
     }
 
