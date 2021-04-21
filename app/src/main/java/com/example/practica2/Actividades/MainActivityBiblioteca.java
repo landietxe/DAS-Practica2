@@ -18,10 +18,13 @@ import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -30,6 +33,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.provider.MediaStore;
 import android.view.Gravity;
 import android.view.Menu;
@@ -46,6 +50,7 @@ import com.example.practica2.Fragments.fragmentBiblioteca;
 import com.example.practica2.Fragments.fragmentInfoLibroBibliotecaLand;
 import com.example.practica2.R;
 import com.example.practica2.BD.miBD;
+import com.example.practica2.ServicioMusica.ServicioMusica;
 import com.example.practica2.WorkManager.GuardarImagenLibro;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -58,6 +63,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -74,6 +80,7 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
     private Toolbar toolbar;
     private String nombreUsuario="";
 
+    //Imagen libro
     private ImageView imageView;
     private int numClicks=0;
     private String isbnClick="";
@@ -84,7 +91,25 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
     private Bitmap bitmapImagen;
     private boolean imagenSubiendo=false;
 
+    //Menú desplegable
     DrawerLayout elmenudesplegable;
+
+    //Servicio Música
+    private ServicioMusica elservicio;
+    private boolean reproduciendo=false;
+    private static boolean mBound;
+    private ServiceConnection laconexion= new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            elservicio= ((ServicioMusica.miBinder)service).obtenServicio();
+        }
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            elservicio=null;
+        }
+    };
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -144,6 +169,42 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
                        newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                        context.startActivity(newIntent);
                        finish();
+                       break;
+                   case R.id.play: //Reproducir música
+                       System.out.println("CLICK EN REPRODUCIR MÚSICA");
+                       System.out.println(isMyServiceRunning(ServicioMusica.class));
+                       if (permisoEstadoTelefono()) {
+                           if (!mBound) {
+                               Intent myService = new Intent(getApplicationContext(), ServicioMusica.class);
+                               bindService(myService, laconexion, Context.BIND_AUTO_CREATE);
+                               mBound = true;
+                           }
+                           System.out.println("REPRODUCIR," + reproduciendo);
+                           if (!reproduciendo) {
+                               Intent myService = new Intent(getApplicationContext(), ServicioMusica.class);
+                               if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                   startForegroundService(myService);
+                               } else {
+                                   startService(myService);
+                               }
+                               bindService(myService, laconexion, Context.BIND_AUTO_CREATE);
+                               reproduciendo = true;
+                           }
+                       }
+                       break;
+                   case R.id.stop: //Parar música
+                       System.out.println("PARAR");
+                       System.out.println("\tReproduciendo: "+reproduciendo);
+                       System.out.println("\tSerive running: "+isMyServiceRunning(ServicioMusica.class));
+                       Intent intent = new Intent(getApplicationContext(), ServicioMusica.class);
+                       stopService(intent);
+                       if (isMyServiceRunning(ServicioMusica.class)) {
+                           unbindService(laconexion);
+                           System.out.println("Servicio detenido");
+                       }
+                       reproduciendo = false;
+                       break;
+
                }
                elmenudesplegable.closeDrawers();
                return false;
@@ -357,25 +418,7 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
         return false;
 
     }
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode){
-            case 0:{
-                // Si la petición se cancela, granResults estará vacío
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // PERMISO CONCEDIDO, EJECUTAR LA FUNCIONALIDAD
-                    Intent intent = new Intent(this, GoogleMaps.class);
-                    startActivity(intent);
 
-                }
-                else {// PERMISO DENEGADO, DESHABILITAR LA FUNCIONALIDAD O EJECUTAR ALTERNATIVA
-                }
-                return;
-            }
-        }
-    }
 
     @Override
     public void alpulsarObtenerDeGaleria() {
@@ -538,7 +581,7 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
             }
             //PEDIR Permisos
             ActivityCompat.requestPermissions(this, permisos,
-                    0);
+                    2);
 
         } else {
             //EL PERMISO ESTÁ CONCEDIDO, EJECUTAR LA FUNCIONALIDAD
@@ -549,6 +592,7 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        outState.putBoolean("reproduciendo",reproduciendo);
         outState.putParcelable("file_uri", uriimagen);
     }
 
@@ -556,6 +600,110 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
+        System.out.println("ENTRA EN RESTORE");
+        this.reproduciendo=savedInstanceState.getBoolean("reproduciendo");
         uriimagen = savedInstanceState.getParcelable("file_uri");
     }
+
+    //https://stackoverflow.com/questions/600207/how-to-check-if-a-service-is-running-on-android
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    @Override
+    protected void onStop(){
+        System.out.println("ON STOP");
+        super.onStop();
+        if(mBound && reproduciendo){
+            unbindService(laconexion);
+            mBound=false;
+        }
+    }
+
+    public boolean permisoEstadoTelefono(){
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            //EL PERMISO NO ESTÁ CONCEDIDO, PEDIRLO
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_PHONE_STATE)) {
+                // MOSTRAR AL USUARIO UNA EXPLICACIÓN DE POR QUÉ ES NECESARIO EL PERMISO
+
+            } else {
+                //EL PERMISO NO ESTÁ CONCEDIDO TODAVÍA O EL USUARIO HA INDICADO
+                //QUE NO QUIERE QUE SE LE VUELVA A SOLICITAR
+            }
+            //PEDIR EL PERMISO
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE},
+                    3);
+
+        } else {
+            return true;
+        }
+        return false;
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode){
+            case 0:{
+                // Si la petición se cancela, granResults estará vacío
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // PERMISO CONCEDIDO, EJECUTAR LA FUNCIONALIDAD
+                    Intent intent = new Intent(this, GoogleMaps.class);
+                    startActivity(intent);
+
+                }
+                else {// PERMISO DENEGADO, DESHABILITAR LA FUNCIONALIDAD O EJECUTAR ALTERNATIVA
+                }
+                return;
+            }
+            case 2:{
+                // Si la petición se cancela, granResults estará vacío
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // PERMISO CONCEDIDO, EJECUTAR LA FUNCIONALIDAD
+                    Intent intent = new Intent(this, GoogleMaps.class);
+                    startActivity(intent);
+
+                }
+                else {// PERMISO DENEGADO, DESHABILITAR LA FUNCIONALIDAD O EJECUTAR ALTERNATIVA
+                }
+                return;
+            }
+            case 3:{
+                // Si la petición se cancela, granResults estará vacío
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if (!mBound) {
+                        Intent myService = new Intent(getApplicationContext(), ServicioMusica.class);
+                        bindService(myService, laconexion, Context.BIND_AUTO_CREATE);
+                        mBound = true;
+                    }
+                    System.out.println("REPRODUCIR," + reproduciendo);
+                    if (!reproduciendo) {
+                        Intent myService = new Intent(getApplicationContext(), ServicioMusica.class);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            startForegroundService(myService);
+                        } else {
+                            startService(myService);
+                        }
+                        bindService(myService, laconexion, Context.BIND_AUTO_CREATE);
+                        reproduciendo = true;
+                    }
+
+                }
+                else {// PERMISO DENEGADO, DESHABILITAR LA FUNCIONALIDAD O EJECUTAR ALTERNATIVA
+                }
+                return;
+            }
+        }
+    }
+
+
 }

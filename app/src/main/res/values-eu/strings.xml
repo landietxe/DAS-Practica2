@@ -63,4 +63,7 @@
     <string name="libreria">Liburu dendak</string>
     <string name="imagenGuardada">Liburuaren argazkia gorde da</string>
     <string name="guardandoImagen">Argazkia gordetzen...</string>
+    <string name="musica">Musika</string>
+    <string name="reproducir_musica">Hasi</string>
+    <string name="parar_musica">Gelditu</string>
 </resources>

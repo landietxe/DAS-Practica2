@@ -15,4 +15,16 @@
         android:id="@+id/mapa"
         android:icon="@drawable/map_icon"
         android:title="@string/libreria" />
+    <item android:title="@string/musica">
+        <menu>
+            <item
+                android:id="@+id/play"
+                android:icon="@android:drawable/ic_media_play"
+                android:title="@string/reproducir_musica" />
+            <item
+                android:id="@+id/stop"
+                android:icon="@android:drawable/ic_media_pause"
+                android:title="@string/parar_musica" />
+        </menu>
+    </item>
 </menu>

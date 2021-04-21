@@ -8,6 +8,8 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
 
     <uses-feature
         android:name="android.hardware.camera2.full"
@@ -76,10 +78,15 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/configalmacen" />
         </provider>
-
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBCdmZMChG_gcT8U1SWLnEbpiVEhUBDJVg" />
+        <service android:name=".ServicioMusica.ServicioMusica"/>
+        <receiver android:name=".ServicioMusica.ReceiverTelefono">
+            <intent-filter>
+                <action android:name="android.intent.action.PHONE_STATE" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

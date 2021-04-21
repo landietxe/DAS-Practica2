@@ -63,4 +63,7 @@
     <string name="libreria">Bookstores</string>
     <string name="imagenGuardada">Image of the book has been saved</string>
     <string name="guardandoImagen">Saving image...</string>
+    <string name="musica">Music</string>
+    <string name="reproducir_musica">Play</string>
+    <string name="parar_musica">Stop</string>
 </resources>
