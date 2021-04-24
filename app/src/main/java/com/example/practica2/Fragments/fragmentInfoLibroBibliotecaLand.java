@@ -113,6 +113,8 @@ public class fragmentInfoLibroBibliotecaLand extends Fragment{
             }
         });
 
+        /*Listener del botón compartir. Se ejecuta una tarea de la clase  "ObtenerTokens" para obtener los tokens
+        de los dispositivos y después se envia una notificación a esos tokens mediante el método "enviarNotificacion"*/
         botonCompartir.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -127,7 +129,7 @@ public class fragmentInfoLibroBibliotecaLand extends Fragment{
                     e.printStackTrace();
                 }
                 OneTimeWorkRequest otwr = new OneTimeWorkRequest.Builder(ObtenerTokens.class).build();
-
+                //Ejecuta la tarea de la clase "ObtenerTokens" para obtener los tokens de los dispositivos.
                 String finalUser = user;
                 WorkManager.getInstance(getContext()).getWorkInfoByIdLiveData(otwr.getId())
                         .observe(getViewLifecycleOwner(), new Observer<WorkInfo>() {
@@ -170,7 +172,10 @@ public class fragmentInfoLibroBibliotecaLand extends Fragment{
         descripcion.setText(StringDescripcion);
     }
     public void enviarNotificacion(String[] lista,String titulo,String autor,String urlimagen,String user,String descripcion){
+        /*Este método envía mediante una tarea de Firebase una notificación a todos los tokens mostrando
+        los datos del libro que el usuario ha compartido.*/
 
+        //Se crea un objeto Data para enviar a la tarea la lista de tokens y los datos del libro.
         Data datos = new Data.Builder()
                 .putString("titulo",titulo)
                 .putString("autor",autor)
@@ -181,6 +186,7 @@ public class fragmentInfoLibroBibliotecaLand extends Fragment{
                 .build();
 
 
+        //Ejecuta la tarea de la clase "CompartirLibroFMC" para envíar la notificación a todos los tokens.
         OneTimeWorkRequest otwr = new OneTimeWorkRequest.Builder(CompartirLibroFMC.class).
                 setInputData(datos)
                 .build();
@@ -189,6 +195,7 @@ public class fragmentInfoLibroBibliotecaLand extends Fragment{
                     @Override
                     public void onChanged(WorkInfo workInfo) {
                         if(workInfo != null && workInfo.getState().isFinished()){
+                            //Se muestra un Toast indicando que el libro ha sido compartido.
                             Toast.makeText(getContext(),"Libro compartido",Toast.LENGTH_SHORT).show();
                         }
                     }

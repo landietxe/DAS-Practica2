@@ -17,8 +17,8 @@ import java.util.ArrayList;
 import java.util.Random;
 
 /**
- * Implementation of App Widget functionality.
- * App Widget Configuration implemented in {@link WidgetConfigureActivity WidgetConfigureActivity}
+ * Clase para crear un widget para la aplicación que muestre un libro aleatoriamente de una lista de los mejores
+ * libros nominados en 2020 de la página GoodReads.
  */
 public class Widget extends AppWidgetProvider {
 
@@ -27,11 +27,9 @@ public class Widget extends AppWidgetProvider {
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
 
-        //CharSequence widgetText = MiWidgetDemoConfigureActivity.loadTitlePref(context, appWidgetId);
-        // Construct the RemoteViews object
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget);
-        //views.setTextViewText(R.id.appwidget_text, widgetText);
 
+        //Recorrer el fichero books.txt y añadir cada línea a un ArrayList
         ArrayList<String> lista = new ArrayList<String>();
         try {
             Resources res = context.getResources();
@@ -42,15 +40,18 @@ public class Widget extends AppWidgetProvider {
                 line = reader.readLine();
             }
 
+            //Obtener un número random
             Random rand = new Random(); //instance of random class
             int upperbound = lista.size();
             int int_random = rand.nextInt(upperbound);
+            //Obtener los datos de un libro aleatoriamente
             String frase= lista.get(int_random);
             String [] datos = frase.split(";");
-            String categoria = datos[0];
-            String titulo = datos[1];
-            String autor = datos[2];
+            String categoria = datos[0]; //Categoria
+            String titulo = datos[1]; //Título
+            String autor = datos[2]; //Autor
 
+            //Asignar los datos a los elementos del widget
             views.setTextViewText(R.id.categoria, categoria);
             views.setTextViewText(R.id.titulo, titulo);
             views.setTextViewText(R.id.autor, autor);
@@ -60,7 +61,7 @@ public class Widget extends AppWidgetProvider {
         }
 
 
-
+        //Forzar actualización del widget desde el propio widget al darle a un botón.
         Intent intent = new Intent(context,Widget.class);
         intent.setAction("com.example.Practica2.ACTUALIZAR_WIDGET");
         intent.putExtra( AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
@@ -85,15 +86,13 @@ public class Widget extends AppWidgetProvider {
 
     @Override
     public void onDeleted(Context context, int[] appWidgetIds) {
-        // When the user deletes the widget, delete the preference associated with it.
-        for (int appWidgetId : appWidgetIds) {
-            WidgetConfigureActivity.deleteTitlePref(context, appWidgetId);
-        }
     }
 
     @Override
     public void onEnabled(Context context) {
         // Enter relevant functionality for when the first widget is created
+
+        //Forzar actualización del widget automáticamente mediante alarma
         am=(AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         // Enter relevant functionality for when the first widget is created
         Intent intent = new Intent(context, AlarmManagerBroadcastRecevier.class);

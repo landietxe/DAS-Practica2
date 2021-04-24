@@ -17,6 +17,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class ObtenerImagenLibro extends Worker {
+    /*Clase que define una tarea para obtener el nombre de la imagen que un usuario ha sacado a un libro.*/
 
     public ObtenerImagenLibro(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
@@ -26,6 +27,12 @@ public class ObtenerImagenLibro extends Worker {
     @NonNull
     @Override
     public ListenableWorker.Result doWork() {
+
+        /*Método principal en el que se ejecuta la tarea. Este método envía una petición al servicio web
+        "obtenerUsuarioLibroImagen.php" para obtener el nombre de la imagen que un usuario ha sacado
+        a su libro. Este servicio ejecutará la sentencia contra la base de datos y
+        devolverá el  nombre de la imagen como resultado.
+         */
 
         String user_id = getInputData().getString("user_id");
         String isbn = getInputData().getString("isbn");
@@ -56,7 +63,9 @@ public class ObtenerImagenLibro extends Worker {
             out.print(parametros);
             out.close();
 
+            //Ejecuta la llamada al servicio web
             int statusCode = urlConnection.getResponseCode();
+            //Mirar el código de vuelta y procesar los datos
             if(statusCode == 200){
                 BufferedInputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));

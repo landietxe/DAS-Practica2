@@ -14,12 +14,24 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class GuardarImagenLibro  extends Worker {
+    /*Clase que define una tarea para guardar o actualizar el nombre de una imagen que el usuario haya sacado a un libro*/
+
     public GuardarImagenLibro(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
     }
     @NonNull
     @Override
     public Result doWork() {
+        /*Método principal en el que se ejecuta la tarea. En este método, entre otros datos, se recibe una variable que indica
+        si el usuario ya ha actualizado anteriormente la imagen del libro o si es la primera vez. En caso de que sea la primera vez,
+        se envía una petición al servicio web "guardarUsuarioLibroImagen.php". Este servicio ejecutará la sentencia contra la
+         base de datos para guardar el nombre de la nueva imagen del libro.
+
+         En el caso de que anteriormente ya haya sido actualizado, se envía una petición al servicio web  "actualizarUsuarioLibroImagen.php". Este servicio
+         ejecutará la sentencia contra la base de datos y actualizará el nombre de la imagen del libro.
+
+         */
+
         int statusCode=0;
         String user_id = getInputData().getString("user_id");
         String isbn = getInputData().getString("isbn");
@@ -52,6 +64,7 @@ public class GuardarImagenLibro  extends Worker {
                 out.print(parametros);
                 out.close();
 
+                //Ejecuta la llamada al servicio web
                 statusCode = urlConnection.getResponseCode();
 
             } catch (MalformedURLException e) {
@@ -85,6 +98,7 @@ public class GuardarImagenLibro  extends Worker {
                 out.print(parametros);
                 out.close();
 
+                //Ejecuta la llamada al servicio web
                 statusCode = urlConnection.getResponseCode();
 
             } catch (MalformedURLException e) {

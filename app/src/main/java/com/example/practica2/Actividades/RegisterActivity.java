@@ -63,24 +63,31 @@ public class RegisterActivity extends AppCompatActivity {
         Este método en primer lugar comprueba si ya existe un usuario con el nombre y contraseña introducidos.
         Si ya existe, se muestra un Toast indicándolo. En caso contrario, se añade el usuario a la base de datos
         remota mediante la clase "InsertarUsuario".*/
+
         String user=usuario.getText().toString();
         String password = contraseña.getText().toString();
 
+        //Si el usuario ha metido los datos
         if(!user.equals("")){
+
+            //Se crea un objeto Data para enviar a la tarea el nombre y contraseña del usuario
             Data datos = new Data.Builder()
                     .putString("username",user)
                     .putString("password",password)
                     .build();
+            //Ejecuta la tarea de la clase "InsertarUsuario"
             OneTimeWorkRequest otwr = new OneTimeWorkRequest.Builder(InsertarUsuario.class).setInputData(datos).build();
             WorkManager.getInstance(this).getWorkInfoByIdLiveData(otwr.getId())
                     .observe(this, new Observer<WorkInfo>() {
                         @Override
                         public void onChanged(WorkInfo workInfo) {
                             if(workInfo != null && workInfo.getState().isFinished()){
+                                //Si se ha podido guardar el nuevo usuario, se abre la actividad LoginActivity
                                 if("SUCCEEDED".equals(workInfo.getState().name())){
                                     Intent intent = new Intent(getApplicationContext(),LoginActivity.class);
                                     startActivity(intent);
                                 }
+                                //Si no se ha podido guardar el nuevo usuario, se muestra un Toast.
                                 else{
                                     String mensaje = getString(R.string.usuarioContraseña2);
                                     Toast toast = Toast.makeText(getApplicationContext(), mensaje, Toast.LENGTH_SHORT);

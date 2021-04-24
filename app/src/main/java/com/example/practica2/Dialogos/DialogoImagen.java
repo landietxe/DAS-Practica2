@@ -10,7 +10,9 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.practica2.R;
-
+/*Clase para crear una ventana emergente con un diálogo para que el usuario seleccione como conseguir una foto;
+utilizando la camara del móvil o cargándolo desde la galería.
+ */
 public class DialogoImagen extends DialogFragment {
     DialogoImagen.ListenerdelDialogo miListener;
     private String titulo;
@@ -39,7 +41,7 @@ public class DialogoImagen extends DialogFragment {
         builder.setTitle(titulo);
         builder.setMessage(texto);
 
-        //Establecer boton para confirmar la acción del usuario.
+        //Establecer botón para sacar la foto con la camara del dispositivo.
         builder.setPositiveButton(foto, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -48,7 +50,7 @@ public class DialogoImagen extends DialogFragment {
             }
 
         });
-        //Establecer boton para negar la acción del usuario.
+        //Establecer botón para obtener la imagen de la galería del dispositivo.
         builder.setNegativeButton(galeria, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {

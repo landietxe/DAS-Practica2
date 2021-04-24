@@ -66,4 +66,5 @@
     <string name="musica">Music</string>
     <string name="reproducir_musica">Play</string>
     <string name="parar_musica">Stop</string>
+    <string name="isbnEncontrado">ISBN found:</string>
 </resources>

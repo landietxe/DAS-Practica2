@@ -15,7 +15,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-/*Clase para obtener un recyclerview que visualize los libros que se consiguen a partir
+/*Clase para obtener un recyclerview que visualice los libros que se consiguen a partir
 de la búsqueda del usuario. Esta clase recibe los datos que se quieren mostrar en la lista
 y los asigna a los atributos de la clase.
  */
@@ -41,7 +41,6 @@ public class AdaptadorRecycler extends RecyclerView.Adapter<ViewHolder>  {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         //Asigna a los atributos del ViewHolder los valores a mostrar para una posición concreta
-
         Libro libro = listaLibros.get(position);
         holder.eltexto.setText(libro.getTitle());
         holder.autores.setText(libro.getAutores());

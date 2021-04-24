@@ -23,6 +23,10 @@ import com.google.firebase.messaging.RemoteMessage;
 import java.util.Locale;
 
 public class ServicioFirebase extends FirebaseMessagingService {
+
+    /*Clase que implementa un servicio que extienda de FirebaseMessagingService para poder recibir mensajes
+    y enviar notificaciones.*/
+
     private String titulo;
     private String autor;
     private String urlimagen;
@@ -73,6 +77,8 @@ public class ServicioFirebase extends FirebaseMessagingService {
 
 
             if(remoteMessage.getNotification().getClickAction().equals("MENSAJE")){
+
+                //Asignar los datos que se van a enviar a la siguiente actividad si el usuario pulsa en la notificación
                 Intent i = new Intent(this, LibroCompartido.class);
                 i.putExtra("titulo",titulo);
                 i.putExtra("autor",autor);
@@ -80,9 +86,9 @@ public class ServicioFirebase extends FirebaseMessagingService {
                 i.putExtra("user",user);
                 i.putExtra("descripcion",descripcion);
 
-                //https://stackoverflow.com/questions/21562339/intent-extras-is-not-updating
                 PendingIntent intentEnNot = PendingIntent.getActivity(this,0,i,PendingIntent.FLAG_UPDATE_CURRENT);
 
+                //Mostrar notificación cuando la aplicación esté en primer plano
                 String tituloNotificacion = getString(R.string.notificacionLibroCompartido);
                 String mensaje =getString(R.string.notificacionLibroCompartido2);
                 elBuilder.setSmallIcon(android.R.drawable.stat_sys_warning)

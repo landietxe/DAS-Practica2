@@ -20,9 +20,11 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.SQLOutput;
 
-//https://wiki.openstreetmap.org/wiki/Map_features
-//https://towardsdatascience.com/loading-data-from-openstreetmap-with-python-and-the-overpass-api-513882a27fd0
 public class BuscarLibrerias  extends Worker {
+    /*Clase que define una tarea para obtener las librerías que se encuentren dentro de una área especificada.
+        Basado en el ejemplo de la página "Loading Data from OpenStreetMap with Python and the Overpass API"
+        //https://towardsdatascience.com/loading-data-from-openstreetmap-with-python-and-the-overpass-api-513882a27fd0
+    * */
     public BuscarLibrerias(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
     }
@@ -40,11 +42,8 @@ public class BuscarLibrerias  extends Worker {
             urlConnection.setConnectTimeout(30000);
             urlConnection.setReadTimeout(30000);
 
-            //[out:json];node[shop=books](42.90607549704063,-3.5251062060323615,43.80539710295936,-2.288254193967638);out;
-            //Generar parámetros
+            //Generar parámetros: (obtener respuesta en json y los "nodos" que sean tiendas de libros)
             String data="[out:json];node[shop=books]"+bbox+";out;";
-            System.out.println("DATA" + data);
-
             Uri.Builder builder = new Uri.Builder()
                     .appendQueryParameter("data", data);
             String parametros = builder.build().getEncodedQuery();
@@ -56,14 +55,15 @@ public class BuscarLibrerias  extends Worker {
             urlConnection.setDoOutput(true);
             urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 
-            System.out.println(urlConnection.toString());
-
+            //Para incluir los parámetros en la llamada se usa un objeto PrintWriter
             PrintWriter out = new PrintWriter(urlConnection.getOutputStream());
             out.print(parametros);
             out.close();
 
+            //Ejecuta la llamada al servicio web
             int statusCode = urlConnection.getResponseCode();
-            System.out.println(statusCode);
+
+            //Mirar el código de vuelta y procesar los datos
             if (statusCode == 200) {
                 System.out.println("CODIGO 200");
                 System.out.println(urlConnection.getResponseMessage());

@@ -21,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.practica2.Dialogos.DialogoConfirmar;
 import com.example.practica2.R;
 import com.example.practica2.BD.miBD;
@@ -111,13 +112,13 @@ public class InfoLibro extends AppCompatActivity implements DialogoConfirmar.Lis
             this.tvDescripcion.setText(descripcion);
 
 
-
+            //Si el libro no tiene portada, cargar foto sin portada
             if(imagen.equals("")){
                 this.imagen.setImageResource(R.drawable.no_cover);
             }
             else{
                 //Cargar la imagen
-                Picasso.get().load(imagen.replace("http", "https")).into(this.imagen);
+                Glide.with(getApplicationContext()).load(imagen.replace("http","https")).into(this.imagen);
             }
         }
     }

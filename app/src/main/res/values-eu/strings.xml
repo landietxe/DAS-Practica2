@@ -66,4 +66,5 @@
     <string name="musica">Musika</string>
     <string name="reproducir_musica">Hasi</string>
     <string name="parar_musica">Gelditu</string>
+    <string name="isbnEncontrado">Aurkitutako ISBN:</string>
 </resources>

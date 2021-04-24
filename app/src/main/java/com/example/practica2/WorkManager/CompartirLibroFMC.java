@@ -16,6 +16,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class CompartirLibroFMC extends Worker {
+    /*Clase que define una tarea para enviar una notificación mediante Firebase compartiendo el libro de un usuario.*/
+
     public CompartirLibroFMC(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
     }
@@ -23,6 +25,10 @@ public class CompartirLibroFMC extends Worker {
     @NonNull
     @Override
     public ListenableWorker.Result doWork() {
+        /*Método principal en el que se ejecuta la tarea. Se reciben los datos del libro  y la lista de tokens (dispositivos)
+        a los que se quiere compartir el libro. El método envía una petición  al servicio web "enviarNotificacion.php". Este servicio enviará una
+        notificación a todos los tokens indicados compartiendo el libro.
+         */
 
         //obtener tokens y mensaje
         String titulo = getInputData().getString("titulo");
@@ -46,11 +52,13 @@ public class CompartirLibroFMC extends Worker {
             urlConnection.setDoOutput(true);
             urlConnection.setRequestProperty("Content-Type","application/json");
 
+            //Por cada token recibido como dato, se añade a un JSONArray
             JSONArray tokensJSON = new JSONArray();
             for(String token: tokens){
                 tokensJSON.put(token);
             }
 
+            //Objeto para enviar los parámetros en formato JSON
             JSONObject parametrosJSON = new JSONObject();
             parametrosJSON.put("titulo",titulo);
             parametrosJSON.put("autor",autor);
@@ -63,6 +71,7 @@ public class CompartirLibroFMC extends Worker {
             out.print(parametrosJSON.toString());
             out.close();
 
+            //Ejecuta la llamada al servicio web
             int statusCode = urlConnection.getResponseCode();
 
             if (statusCode == 200) {

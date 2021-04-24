@@ -17,6 +17,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class GuardarTokenFMC extends Worker {
+    /*Clase que define una tarea para insertar un nuevo token de un dispositivo en la base de datos remota*/
 
     public GuardarTokenFMC(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
@@ -25,6 +26,14 @@ public class GuardarTokenFMC extends Worker {
     @NonNull
     @Override
     public ListenableWorker.Result doWork() {
+
+        /*Método principal en el que se ejecuta la tarea. Por un lado se comprueba si el token del dispositivo actual ya
+        se encuentra en la base de datos remota enviando una petición al servicio web "obtenerTokens.php". Este servicio ejecutará la sentencia contra la
+         base de datos y devolverá el resultado. En el resultado se comprobará si ya se encuentra el token actual o no.
+
+        En caso de que el token no se encuentre en el resultado, se envía otra petición al servicio web "guardarToken.php" para guardar el token actual
+        en la base de datos remota.
+         */
 
         //obtener TOKEN
         String valor = getInputData().getString("token");
@@ -55,8 +64,10 @@ public class GuardarTokenFMC extends Worker {
                 PrintWriter out = new PrintWriter(urlConnection.getOutputStream());
                 out.print(parametros);
                 out.close();
-                int statusCode = urlConnection.getResponseCode();
 
+                //Ejecuta la llamada al servicio web
+                int statusCode = urlConnection.getResponseCode();
+                //Mirar el código de vuelta y procesar los datos
                 if (statusCode == 200) {
                     return Result.success();
 
@@ -73,6 +84,8 @@ public class GuardarTokenFMC extends Worker {
     devuelve false. En caso contrario, devuelve true.
      */
     public boolean tokenExiste(String token) {
+        /*Devuelve true si el token actual ya se encuentra en la base de datos remota, y false
+        en caso contrario.*/
 
         //Se genera un objeto HttpURLConnection con la configuración correspondiente
         String direccion = "http://ec2-54-167-31-169.compute-1.amazonaws.com/lechevarria008/WEB/Practica2/obtenerTokens.php";
@@ -84,8 +97,9 @@ public class GuardarTokenFMC extends Worker {
             urlConnection.setConnectTimeout(5000);
             urlConnection.setReadTimeout(5000);
 
+            //Ejecuta la llamada al servicio web
             int statusCode = urlConnection.getResponseCode();
-
+            //Mirar el código de vuelta y procesar los datos
             if (statusCode == 200) {
                 BufferedInputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));

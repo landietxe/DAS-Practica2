@@ -16,10 +16,14 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class AlarmManagerBroadcastRecevier  extends BroadcastReceiver {
+    /*Clase que extiende de BroadcastReceiver para la actualizar
+    el widget automáticamente.
+     */
     @Override
     public void onReceive(Context context, Intent intent) {
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(),R.layout.widget);
         ArrayList<String> lista = new ArrayList<String>();
+        //Recorrer el fichero books.txt y añadir cada línea a un ArrayList
         try {
             Resources res = context.getResources();
             BufferedReader reader = new BufferedReader(new InputStreamReader(res.openRawResource(R.raw.books)));
@@ -29,15 +33,18 @@ public class AlarmManagerBroadcastRecevier  extends BroadcastReceiver {
                 lista.add(line);
             }
 
-            Random rand = new Random(); //instance of random class
+            //Obtener un número random
+            Random rand = new Random();
             int upperbound = lista.size();
             int int_random = rand.nextInt(upperbound);
+            //Obtener los datos de un libro aleatoriamente
             String frase= lista.get(int_random);
             String [] datos = frase.split(";");
-            String categoria = datos[0];
-            String titulo = datos[1];
-            String autor = datos[2];
+            String categoria = datos[0];//Categoria
+            String titulo = datos[1];//Título
+            String autor = datos[2];//Autor
 
+            //Asignar los datos a los elementos del widget
             remoteViews.setTextViewText(R.id.categoria, categoria);
             remoteViews.setTextViewText(R.id.titulo, titulo);
             remoteViews.setTextViewText(R.id.autor, autor);

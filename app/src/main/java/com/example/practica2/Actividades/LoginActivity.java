@@ -44,8 +44,7 @@ import java.util.List;
 import java.util.Locale;
 
 /*Actividad que permite al usuario iniciar sesión con un nombre y una contraseña
- o abrir otra actividad para registrarse.
- */
+ o abrir otra actividad para registrarse.*/
 public class LoginActivity extends AppCompatActivity {
     private EditText usuario;
     private EditText contraseña;
@@ -92,15 +91,17 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-    /*
-    Método que se ejecuta al abrir la aplicación. Obtiene el token del dispositivo
-    y mediante la clase "GuardarTokenFMC" guarda el token en una base de datos remota en caso de que
-    no se haya añadido anteriormente. Si se añade el nuevo token, se muestra un Toast.
-     */
     public void guardarToken(String token){
+        /*Método que se ejecuta al abrir la aplicación. Obtiene el token del dispositivo
+        y mediante la clase "GuardarTokenFMC" guarda el token en una base de datos remota en caso de que
+        no se haya añadido anteriormente. Si se añade el nuevo token, se muestra un Toast.
+        */
+
+        //Se crea un objeto Data para enviar a la tarea el token del dispositivo actual.
         Data datos = new Data.Builder()
                 .putString("token",token)
                 .build();
+        //Ejecuta la tarea de la clase "GuardarTokenFMC"
         OneTimeWorkRequest otwr = new OneTimeWorkRequest.Builder(GuardarTokenFMC.class).setInputData(datos).build();
         WorkManager.getInstance(this).getWorkInfoByIdLiveData(otwr.getId())
                 .observe(this, new Observer<WorkInfo>() {
@@ -123,36 +124,41 @@ public class LoginActivity extends AppCompatActivity {
 
     public void onClickLogin(View v) {
         /*Método que se ejecuta cuando el usuario pulsa en el botón de Login.
-    Por un lado, se obtienen los datos que el usuario ha introducido y se busca en la base de datos remota
-    mediante la clase "ObtenerUsuario" si el usuario existe.
-    En caso de existir, se escribe en el fichero externo "usuario_actual.txt" el nombre del usuario y
-    su identificador y a continuación se abre la actividad "MainActivityBiblioteca".
-    Si el usuario no se ha encontrado en la base de datos se mostrará un Toast.*/
+        Por un lado, se obtienen los datos que el usuario ha introducido y se obtiene  el identificador del usuario
+        mediante la clase "ObtenerUsuario". En caso de que el usuario no exista, el identificador será null.
+        En caso de existir, se escribe en el fichero externo "usuario_actual.txt" el nombre del usuario y
+        su identificador y a continuación se abre la actividad "MainActivityBiblioteca".
+        Si el usuario no se ha encontrado en la base de datos se mostrará un Toast.*/
 
         String user = usuario.getText().toString();
         String password = contraseña.getText().toString();
         if(user != null && password != null) {
+            //Se crea un objeto Data para enviar a la tarea el nombre y la contraseña del usuario.
             Data datos = new Data.Builder()
                     .putString("username", user)
                     .putString("password", password)
                     .build();
+            //Ejecuta la tarea de la clase "ObtenerUsuario"
             OneTimeWorkRequest otwr = new OneTimeWorkRequest.Builder(ObtenerUsuario.class).setInputData(datos).build();
             WorkManager.getInstance(this).getWorkInfoByIdLiveData(otwr.getId())
                     .observe(this, new Observer<WorkInfo>() {
                         @Override
                         public void onChanged(WorkInfo workInfo) {
                             if (workInfo != null && workInfo.getState().isFinished()) {
-                                //Obtener los datos del resultado de la conexión asincrona ejecuta desde la clase conexionBDWebService
+                                //Obtener los datos del resultado
                                 if ("SUCCEEDED".equals(workInfo.getState().name())) {
                                     String result = workInfo.getOutputData().getString("resultados");
                                     JSONParser parser = new JSONParser();
                                     JSONObject json = null;
                                     try {
                                         json = (JSONObject) parser.parse(result);
+                                        //Obtiene el identificador de la respuesta json
                                         String id = (String) json.get("user_id");
+                                        //Comprueba que el identificador no sea null ( contraseña correcta)
                                         if (id != null) {
                                             login(id, user);
                                         } else {
+                                            //Si la contraseña no es correcta mostrar un Toast.
                                             String mensaje = getString(R.string.ususuarioContraseña);
                                             Toast toast = Toast.makeText(getApplicationContext(), mensaje, Toast.LENGTH_SHORT);
                                             toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
@@ -162,6 +168,7 @@ public class LoginActivity extends AppCompatActivity {
                                         e.printStackTrace();
                                     }
                                 } else {
+                                    //Si no se ha podido completar la petición y el usuario no existe, mostrar un Toast.
                                     String mensaje = getString(R.string.usuarioNoExiste);
                                     Toast toast = Toast.makeText(getApplicationContext(), mensaje, Toast.LENGTH_SHORT);
                                     toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
@@ -176,10 +183,15 @@ public class LoginActivity extends AppCompatActivity {
     public void onClickRegistrar(View v){
         /*Método que se ejecuta cuando el usuario pulsa en el botón de registrarse.Este método
     abrirá la actividad "RegisterActivity" para que el usuario se pueda registrar.*/
+
         Intent intent = new Intent(this,RegisterActivity.class);
         startActivity(intent);
     }
     public void login (String id,String user){
+        /*Método que se ejecuta cuando el usuario ha iniciado sesión con un nombre y contraseña válidos. El método escribe en un
+        fichero externo el identificador y el nombre de usuario y a continuación abre la actividad "MainActivityBiblioteca".
+         */
+
         try {
             //Escribir en fichero externo el identificador y nombre del usuario
             OutputStreamWriter fichero = new OutputStreamWriter(openFileOutput("usuario_actual.txt", Context.MODE_PRIVATE));

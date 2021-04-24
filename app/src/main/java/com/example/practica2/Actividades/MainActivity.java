@@ -24,6 +24,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -64,7 +65,8 @@ import java.util.Locale;
 
 
 /*Actividad que permite al usuario hacer una busqueda relacionada con libros tras lo cual se visualizarán los resultados
-en un recyclerview. Si el usuario selecciona alguno se abrirá una nueva actividad con la información de ese libro.
+en un recyclerview. Si el usuario selecciona alguno se abrirá una nueva actividad con la información de ese libro. También se le permite
+buscar los libros escaneando mediante una imagen que muestre el código de barras del ISBN del libro.
  */
 public class MainActivity extends AppCompatActivity implements DialogoImagen.ListenerdelDialogo {
 
@@ -221,9 +223,14 @@ public class MainActivity extends AppCompatActivity implements DialogoImagen.Lis
 
     public void onClickEscanear(View v){
 
-        //Si dispone de permisos, pide al usuario seleccionar la imagen del código de barras de la galeria o sacar
-        //una foto nueva
+        /*Método que se ejecuta cuando el usuario pulsa en el botoón de escanear el código de barras de un libro.
+        Por un lado, se le piden al usuario los permisos CAMERA y WRITE_EXTERNAL_STORAGE. En caso de que el usuario acepte
+        los permisos, se crea un diálogo preguntando de donde desea obtener la imagen a escanear; cargándolo de una foto
+        existente de la galería o sacando una nueva foto.*/
+
         if(comprobarPermisos()) {
+            //Si dispone de permisos, pide al usuario seleccionar la imagen del código de barras de la galeria o sacando
+            //una nueva foto
             String titulo = getString(R.string.escanearLibro);
             String texto= getString(R.string.escanearModo);
             DialogFragment dialogoImagen= new DialogoImagen(titulo,texto);
@@ -233,15 +240,18 @@ public class MainActivity extends AppCompatActivity implements DialogoImagen.Lis
     }
 
     @Override
-    //Opción Obtener de la Galeria del diálogo
     public void alpulsarObtenerDeGaleria() {
+        /*Método que se ejecuta cuando el usuario pulsa el bóton "Galería" en el diálogo de como obtener
+        la imagen del código de barras del libro. Se creará un nuevo Intent para que el usuario seleccione la imagen desde su galería.*/
         Intent elIntentGal = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(elIntentGal, 10);
     }
 
     @Override
-    //Opción Sacar Foto del diálogo
     public void alpulsarSacarFoto() {
+        /*Método que se ejecuta cuando el usuario pulsa el bóton "Foto" en el diálogo de como obtener
+        la imagen del código de barras del libro. Se creará un nuevo Intent para que el usuario pueda sacar una nueva foto
+        utilizando la cámara del dispositivo*/
 
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
         String nombrefich = "IMG_" + timeStamp + "_";
@@ -264,21 +274,28 @@ public class MainActivity extends AppCompatActivity implements DialogoImagen.Lis
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        /*Método que se ejecuta una vez terminadas las acciones de obtener la foto de la galería o sacando una nueva foto.
+        En ambos casos, se llama al método "escanear".
+         */
+
         if (requestCode == 10 && resultCode == RESULT_OK) { //Foto de galeria
             uriimagen = data.getData();
             escanear();
 
         }
         if (requestCode == 11 && resultCode == RESULT_OK) { //Foto tomada con teléfono
-            Log.i("etiqueta","escanear");
             escanear();
         }
     }
     public void escanear(){
+        /*En este método se escanea la imagen proporcionada mediante técnicas de aprendizaje automático
+        de Firebase.
+         */
+
         //Código obtenido de ML Kit Scan Barcodes de Firebase
         //https://developers.google.com/ml-kit/vision/barcode-scanning/android#java
 
-        //Configure the barcode scanner
+        //Configurar el escaner de la barra de código
         BarcodeScannerOptions options =
                 new BarcodeScannerOptions.Builder()
                         .setBarcodeFormats(
@@ -286,22 +303,22 @@ public class MainActivity extends AppCompatActivity implements DialogoImagen.Lis
                                 Barcode.FORMAT_EAN_8)
                         .build();
 
-        //Prepare the input image
+        //Preparar la imagen de entrada
         InputImage image=null;
         try {
             Log.i("etiqueta",uriimagen.toString());
             image = InputImage.fromFilePath(this, uriimagen);
 
-            //Get an instance of BarcodeScanner
+            //Obtener una instancia de BarcodeScanner
             BarcodeScanner scanner = BarcodeScanning.getClient(options);
 
-            //Process the image
+            //Procesar la imagen
             Task<List<Barcode>> result = scanner.process(image)
                     .addOnSuccessListener(new OnSuccessListener<List<Barcode>>() {
                         @Override
-                        // Task completed successfully
+                        // La tarea se ha completado correctamente
                         public void onSuccess(List<Barcode> barcodes) {
-                            //Get information from barcodes
+                            //Obtener información del código de barras
                             boolean libroEncontrado=false;
                             for (Barcode barcode : barcodes) {
 
@@ -312,15 +329,25 @@ public class MainActivity extends AppCompatActivity implements DialogoImagen.Lis
                                         String isbn = barcode.getRawValue();
                                         String query="isbn:"+isbn;
                                         inicializarRecyclerView();
+                                        //Se llama al método obtenerDatos para buscar el libro con el isbn en Google Books
                                         obtenerDatos(isbn);
                                         Log.i("etiqueta","ISBN Libro:" + isbn);
                                         libroEncontrado=true;
+
+                                        //Mostrar un Toast indicando cual es el ISBN que se ha encontrado
+                                        String mensaje = getString(R.string.isbnEncontrado) + isbn;
+                                        Toast toast = Toast.makeText(getApplicationContext(), mensaje, Toast.LENGTH_SHORT);
+                                        toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+                                        toast.show();
                                         break;
                                 }
                             }
                             if(!libroEncontrado){
+                                //Si no se ha podido escanear correctamente o no se ha encontrado ningún libro, se indica mediante un Toast.
                                 Toast.makeText(MainActivity.this, R.string.errorEscaneo, Toast.LENGTH_SHORT).show();
                             }
+
+                            //Se borra el fichero temporal utilizado para guardar la imagen en tamaño completo
                             boolean deleted = false;
                             if(fichImg!=null) {
                                 try {
@@ -348,6 +375,12 @@ public class MainActivity extends AppCompatActivity implements DialogoImagen.Lis
 
     public boolean comprobarPermisos(){
 
+        /*Método que comprueba si el usuario ha concedido a la aplicación los permisos de
+        CAMERA y WRITE_EXTERNAL_STORAGE. En caso de que no los haya concedido, se le piden. Si el usuario
+        no quiere dar los permisos, el método devuelve false por lo que no se ejecutará la funcionalidad. En caso contrario
+        devuelve true.
+         */
+
         String [] permisos = new String[]{
                 Manifest.permission.CAMERA,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE};
@@ -374,6 +407,22 @@ public class MainActivity extends AppCompatActivity implements DialogoImagen.Lis
 
 
 
+
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        //Método que guarda la uri de la imagen cuando se rota el dispositivo
+        outState.putParcelable("file_uri", uriimagen);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        //Método que recupera la uri de la imagen cuando se rota el dispositivo
+        uriimagen = savedInstanceState.getParcelable("file_uri");
+    }
+
     @Override
     public void onBackPressed(){
         /*Método que se ejecuta cuando el usuario pulsa el bóton del móvil para volver hacia atras.
@@ -384,20 +433,5 @@ public class MainActivity extends AppCompatActivity implements DialogoImagen.Lis
         newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(newIntent);
         finish();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putParcelable("file_uri", uriimagen);
-    }
-
-    /*
-     * Here we restore the fileUri again
-     */
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        uriimagen = savedInstanceState.getParcelable("file_uri");
     }
 }

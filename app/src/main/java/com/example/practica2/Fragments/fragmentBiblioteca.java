@@ -146,10 +146,12 @@ public class fragmentBiblioteca extends Fragment {
             String ISBN = libro.getISBN();
             String url = libro.getThumbnail().replace("http", "https");
 
+            //Se crea un objeto Data para enviar a la tarea el identificador del usuario y el ISBN del libro.
             Data datos = new Data.Builder()
                     .putString("user_id", user_id)
                     .putString("isbn", ISBN)
                     .build();
+            //Ejecuta la tarea de la clase "ObtenerImagenLibro" para obtener el nombre de la imagen cuando el usuario haya cambiado la portada del libro.
             OneTimeWorkRequest otwr = new OneTimeWorkRequest.Builder(ObtenerImagenLibro.class).setInputData(datos).build();
             WorkManager.getInstance(getContext()).getWorkInfoByIdLiveData(otwr.getId())
                     .observe(getViewLifecycleOwner(), new Observer<WorkInfo>() {

@@ -18,6 +18,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class InsertarUsuario  extends Worker {
+    /*Clase que define una tarea para insertar un nuevo usuario en la base de datos remota*/
 
     public InsertarUsuario(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
@@ -25,6 +26,13 @@ public class InsertarUsuario  extends Worker {
     @NonNull
     @Override
     public Result doWork() {
+        /*Método principal en el que se ejecuta la tarea. Por un lado se comprueba si ya existe un usuario con el nombre introducido
+        en la base se de datos remota enviando una petición al servicio web "usuarioExiste.php". Este servicio ejecutará la sentencia contra la base de datos y
+        devolverá el resultado. El resultado será null si el usuario no existe y en caso contrario, será el identificador del usuario.
+
+        En caso de que el usuario no exista, se envía otra petición al servicio web "insertarUsuario.php" para guardar el nuevo usuario
+        en la base de datos remota.
+         */
 
         String username = getInputData().getString("username");
         String password = getInputData().getString("password");
@@ -56,15 +64,12 @@ public class InsertarUsuario  extends Worker {
                 out.print(parametros);
                 out.close();
 
+                //Ejecuta la llamada al servicio web
                 int statusCode = urlConnection.getResponseCode();
-                System.out.println("STATUS CODE: " + statusCode);
+                //Mirar el código de vuelta y procesar los datos
                 if(statusCode == 200){
                     return Result.success();
                 }
-                else{
-                    return Result.failure();
-                }
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -99,8 +104,9 @@ public class InsertarUsuario  extends Worker {
             out.print(parametros);
             out.close();
 
+            //Ejecuta la llamada al servicio web
             int statusCode = urlConnection.getResponseCode();
-
+            //Mirar el código de vuelta y procesar los datos
             if (statusCode == 200) {
                 BufferedInputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));

@@ -151,35 +151,42 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
 
         //Añdir menu desplegable al layout
         elmenudesplegable = findViewById(R.id.drawer);
-        //System.out.println(elmenudesplegable.toString());
         NavigationView elnavigation = findViewById(R.id.elnavigationview);
         elnavigation.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
            @Override
            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                switch (item.getItemId()){
                    case R.id.mapa:
+                       /*Botón de buscar librerias del menú desplegable. El método comprueba
+                       que la aplicación dispone del permiso ACESS_FINE_LOCATION, y de ser así, abre la actividad
+                       "GoogleMaps"*/
+
                        if(pedirPermisoLocalizacion()){
                            Intent intent = new Intent(getApplicationContext(), GoogleMaps.class);
                            startActivity(intent);
                        }
                        break;
                    case R.id.logout:
+                        /*Botón de cerrar sesión del menú desplegable. El método finaliza la actividad actual
+                         y abre la actividad "LoginActivity*/
                        Context context = getApplicationContext();
                        Intent newIntent = new Intent(context, LoginActivity.class);
                        newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                        context.startActivity(newIntent);
                        finish();
                        break;
-                   case R.id.play: //Reproducir música
-                       System.out.println("CLICK EN REPRODUCIR MÚSICA");
-                       System.out.println(isMyServiceRunning(ServicioMusica.class));
+                   case R.id.play:
+                       /*Botón de reproducir la música del menú desplegable. Si la aplicación contiene el permiso READ_PHONE_STATE,
+                       se comprueba que no haya un servicio ya enlazado anteriormente. De ser así, se enlaza el servicio de la clase
+                       "ServicioMusica". Después, si no se esta reproduciendo la música, se lanza el servicio en segundo plano y se reproduce
+                       la música.
+                        */
                        if (permisoEstadoTelefono()) {
                            if (!mBound) {
                                Intent myService = new Intent(getApplicationContext(), ServicioMusica.class);
                                bindService(myService, laconexion, Context.BIND_AUTO_CREATE);
                                mBound = true;
                            }
-                           System.out.println("REPRODUCIR," + reproduciendo);
                            if (!reproduciendo) {
                                Intent myService = new Intent(getApplicationContext(), ServicioMusica.class);
                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -192,10 +199,9 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
                            }
                        }
                        break;
-                   case R.id.stop: //Parar música
-                       System.out.println("PARAR");
-                       System.out.println("\tReproduciendo: "+reproduciendo);
-                       System.out.println("\tSerive running: "+isMyServiceRunning(ServicioMusica.class));
+                   case R.id.stop:
+                       /*Botón de parar la música del menú desplegable. Si el servicio está en marcha, se quita el enlace con el servicio
+                       y se para la música.*/
                        Intent intent = new Intent(getApplicationContext(), ServicioMusica.class);
                        stopService(intent);
                        if (isMyServiceRunning(ServicioMusica.class)) {
@@ -213,9 +219,9 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
         getSupportActionBar().setHomeAsUpIndicator(android.R.drawable.ic_dialog_info);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        // get menu from navigationView
+        // Obtener referencia a los elementos del menú desplegable
         Menu menu = elnavigation.getMenu();
-        // find MenuItem you want to change
+        // Indicar cual es el nombre del usuario actual
         MenuItem nav_user = menu.findItem(R.id.user);
         nav_user.setTitle(nav_user.getTitle().toString() +": " + nombreUsuario);
 
@@ -230,13 +236,15 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
         /*Método que se ejecuta cuando el usuario selecciona uno de sus libros. Por un lado se comprueba la orientación en la que
         se encuentra el móvil. Si el móvil está en vertical, se abrirá la actividad "InfoLibroBiblioteca" pasandole los datos del libro.
         Si el móvil está en horizontal, ya existe otro fragment en el layout, por lo que se hace cast a su clase y se llama al método
-        "actualizar" para visualizar los datos.*/
+        "actualizar" para visualizar los datos. También se gestiona cuando el usuario hace click 2 veces en un mismo libro para poder cambiar su imagen.*/
         this.ISBN=isbn;
         this.imageView=imageview;
         int orientation = getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_LANDSCAPE){ //Pantalla en horizontal, usamos el otro fragment
-            if(this.ISBN.equals(isbnClick)){//Ha vuelto a click-ar en la misma imagen, abrimos diálogo para cambiar la imagen.
+            if(this.ISBN.equals(isbnClick)){
+                //Ha vuelto a click-ar por segunda vez en la misma imagen, abrimos diálogo para cambiar la imagen.
                 if(comprobarPermisos()) {
+                    //Si la aplicación tiene los permisos CAMERA y WRITE_EXTERNAL_STORAGE se abre el diálogo de seleccionar una nueva imagen
                     String titulo = getString(R.string.cambiarPortada);
                     String texto = getString(R.string.cambiarPortada2);
                     DialogFragment dialogoImagen = new DialogoImagen(titulo, texto);
@@ -396,7 +404,10 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
 
     public boolean pedirPermisoLocalizacion(){
 
-        //Método que comprueba si la aplicación tiene el permiso "ACESS_FINE_LOCATION"
+        /*Método que comprueba si la aplicación tiene el permiso "ACESS_FINE_LOCATION"
+        En caso de que el usuario no lo haya concedido, se le pide el permiso. Si el usuario
+        no quiere dar el permiso, el método devuelve false por lo que no se ejecutará la funcionalidad. En caso contrario
+        devuelve true.*/
 
         //PEDIR PERMISOS
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -413,21 +424,24 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
 
         } else {//EL PERMISO ESTÁ CONCEDIDO, EJECUTAR LA FUNCIONALIDAD
             return true;
-
         }
         return false;
-
     }
 
 
     @Override
     public void alpulsarObtenerDeGaleria() {
+        /*Método que se ejecuta cuando el usuario pulsa el bóton "Galería" en el diálogo de como obtener
+        la nueva foto  del libro. Se creará un nuevo Intent para que el usuario seleccione la imagen desde su galería.*/
         Intent elIntentGal = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(elIntentGal, 10);
     }
 
     @Override
     public void alpulsarSacarFoto() {
+        /*Método que se ejecuta cuando el usuario pulsa el bóton "Foto" en el diálogo de como obtener
+        la nueva foto  del libro. Se creará un nuevo Intent para que el usuario pueda sacar una nueva foto
+        utilizando la cámara del dispositivo*/
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
         String nombrefich = "IMG_" + timeStamp + "_";
         File directorio=this.getFilesDir();
@@ -449,18 +463,27 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        /*Método que se ejecuta una vez terminadas las acciones de obtener la foto de la galería o sacando una nueva foto.
+        En ambos casos, se obtiene el nombre de la imagen y se llama al método "guardarImagen".*/
         if (requestCode == 10 && resultCode == RESULT_OK) { //Foto de galeria
             uriimagen = data.getData();
-            imageName = uriimagen.toString().split("%2F")[uriimagen.toString().split("%2F").length - 1];
+            //imageName = uriimagen.toString().split("%2F")[uriimagen.toString().split("%2F").length - 1];
+            imageName= new File(uriimagen.getPath()).getName();
             guardarImagen();
         }
         if (requestCode == 11 && resultCode == RESULT_OK) { //Foto tomada con teléfono
-            imageName = uriimagen.toString().split("/")[uriimagen.toString().split("/").length - 1];
+            //imageName = uriimagen.toString().split("/")[uriimagen.toString().split("/").length - 1];
+            imageName = new File(uriimagen.getPath()).getName();
             guardarImagen();
         }
     }
 
     public void guardarImagen() {
+                /*En este método por un lado se llama al método "reescalarImagen" para escalar la imagen
+         al tamaño que se va a mostrar, pero manteniendo su aspecto. Después, se sube la imagen a Firebase
+         y en caso de que se suba correctamente, se llama al método "guardarEnBD" para guardar la referencia
+         de la iamgen en la base de datos Remota.
+         */
         try {
             bitmapImagen = reescalarImagen();
             this.imageView.setRotation(90);
@@ -507,7 +530,12 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
         });
     }
     public void guardarEnBD(){
-        //Subir nombre de la imagen a la BD remota
+        /*Método para guardar la referencia de una imagen de Firebase en la base de datos remota.
+        Una vez guardada la imagen, se borra el fichero temporal que se creó (en caso de que la imagen haya sido
+        sacada con la cámara)*/
+
+        //Se crea un objeto Data para enviar a la tarea el nombre de la imagen, el isbn del libro, el identificador del usuario
+        //y una variable que indica si es la primera vez que se cambia la foto o no.
         Data datos = new Data.Builder()
                 .putString("user_id",user_id)
                 .putString("isbn",ISBN)
@@ -518,6 +546,7 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
         OneTimeWorkRequest otwr = new OneTimeWorkRequest.Builder(GuardarImagenLibro.class).
                 setInputData(datos)
                 .build();
+        //Ejecuta la tarea de la clase "GuardarImagenLibro" para guardar el nombre de la imagen
         WorkManager.getInstance(this).getWorkInfoByIdLiveData(otwr.getId())
                 .observe(this, new Observer<WorkInfo>() {
                     @Override
@@ -544,6 +573,8 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
     }
 
     public Bitmap reescalarImagen() throws IOException {
+        /*Método que escala la imagen al tamaño que se van a mostrar, pero
+        manteniendo su aspecto*/
 
         Bitmap bitmapFoto = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uriimagen);
         int anchoDestino = this.imageView.getWidth();
@@ -565,6 +596,10 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
     }
 
     public boolean comprobarPermisos(){
+                /*Método que comprueba si el usuario ha concedido a la aplicación los permisos de
+        CAMERA y WRITE_EXTERNAL_STORAGE. En caso de que no los haya concedido, se le piden. Si el usuario
+        no quiere dar los permisos, el método devuelve false por lo que no se ejecutará la funcionalidad. En caso contrario
+        devuelve true.*/
 
         String [] permisos = new String[]{
                 Manifest.permission.CAMERA,
@@ -592,6 +627,7 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        //Método que guarda la uri de la imagen y el estado de la música cuando se rota el dispositivo
         outState.putBoolean("reproduciendo",reproduciendo);
         outState.putParcelable("file_uri", uriimagen);
     }
@@ -600,13 +636,14 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        System.out.println("ENTRA EN RESTORE");
+        //Método que recupera la uri de la imagen y el estado de la música cuando se rota el dispositivo
         this.reproduciendo=savedInstanceState.getBoolean("reproduciendo");
         uriimagen = savedInstanceState.getParcelable("file_uri");
     }
 
-    //https://stackoverflow.com/questions/600207/how-to-check-if-a-service-is-running-on-android
     private boolean isMyServiceRunning(Class<?> serviceClass) {
+        /*Método para comprobar si un servicio está ejecutándose:
+        //https://stackoverflow.com/questions/600207/how-to-check-if-a-service-is-running-on-android*/
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
             if (serviceClass.getName().equals(service.service.getClassName())) {
@@ -619,7 +656,6 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
 
     @Override
     protected void onStop(){
-        System.out.println("ON STOP");
         super.onStop();
         if(mBound && reproduciendo){
             unbindService(laconexion);
@@ -628,6 +664,11 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
     }
 
     public boolean permisoEstadoTelefono(){
+        /*Método que comprueba si el usuario ha concedido a la aplicación el permisos READ_PHONE_STATE.
+        En caso de que no lo haya concedido, se le pide. Si el usuario no quiere dar el permiso,
+        el método devuelve false por lo que no se ejecutará la funcionalidad. En caso contrario
+        devuelve true.*/
+
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
             //EL PERMISO NO ESTÁ CONCEDIDO, PEDIRLO
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_PHONE_STATE)) {
@@ -651,9 +692,13 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
+        /*Método que se ejecuta cuando el usuario concede los permisos. Según el código del permiso, se
+        ejecutará una funcionalidad diferente.*/
+
+
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode){
-            case 0:{
+            case 0:{ //Permiso ACCESS_FINE_LOCATION, abre la actividad "GoogleMaps"
                 // Si la petición se cancela, granResults estará vacío
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // PERMISO CONCEDIDO, EJECUTAR LA FUNCIONALIDAD
@@ -665,19 +710,21 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
                 }
                 return;
             }
-            case 2:{
+            case 2:{ //Permisos de CAMERA y WRITE_EXTERNAL_STORAGE, abre el diálogo de seleccionar la imagen
                 // Si la petición se cancela, granResults estará vacío
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // PERMISO CONCEDIDO, EJECUTAR LA FUNCIONALIDAD
-                    Intent intent = new Intent(this, GoogleMaps.class);
-                    startActivity(intent);
+                    String titulo = getString(R.string.cambiarPortada);
+                    String texto = getString(R.string.cambiarPortada2);
+                    DialogFragment dialogoImagen = new DialogoImagen(titulo, texto);
+                    dialogoImagen.show(getSupportFragmentManager(), "etiqueta");
 
                 }
                 else {// PERMISO DENEGADO, DESHABILITAR LA FUNCIONALIDAD O EJECUTAR ALTERNATIVA
                 }
                 return;
             }
-            case 3:{
+            case 3:{ //Permiso de READ_PHONE_STATE, reproduce la música
                 // Si la petición se cancela, granResults estará vacío
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if (!mBound) {

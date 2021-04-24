@@ -17,7 +17,6 @@
         android:ems="10"
         android:hint="@string/usuario"
         android:inputType="textPersonName"
-        android:text="lander"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView8" />
@@ -73,7 +72,6 @@
         android:ems="10"
         android:hint="@string/contraseña"
         android:inputType="textPassword"
-        android:text="123"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

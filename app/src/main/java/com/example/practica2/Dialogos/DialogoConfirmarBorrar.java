@@ -39,7 +39,7 @@ public class DialogoConfirmarBorrar extends DialogFragment {
         builder.setTitle(titulo);
         builder.setMessage(texto);
 
-        //Establecer boton para confirmar la acción del usuario.
+        //Establecer botón para confirmar la acción del usuario.
         builder.setPositiveButton(si, new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialogInterface, int i) {
@@ -47,7 +47,7 @@ public class DialogoConfirmarBorrar extends DialogFragment {
             miListener.alpulsarSI();
         }
         });
-        //Establecer boton para negar la acción del usuario.
+        //Establecer botón para negar la acción del usuario.
         builder.setNegativeButton(no, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
