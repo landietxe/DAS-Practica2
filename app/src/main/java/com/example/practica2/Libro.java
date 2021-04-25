@@ -1,8 +1,11 @@
 package com.example.practica2;
 
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 //Clase auxiliar para guardar la información de los libros.
-public class Libro {
+public class Libro implements Parcelable {
     private String ISBN;
     private String titulo;
     private String imagen;
@@ -23,6 +26,30 @@ public class Libro {
         this.previewLink=preview;
         this.autores=autores;
     }
+
+    protected Libro(Parcel in) {
+        ISBN = in.readString();
+        titulo = in.readString();
+        imagen = in.readString();
+        editorial = in.readString();
+        autores = in.readString();
+        descripcion = in.readString();
+        idioma = in.readString();
+        previewLink = in.readString();
+    }
+
+    public static final Creator<Libro> CREATOR = new Creator<Libro>() {
+        @Override
+        public Libro createFromParcel(Parcel in) {
+            return new Libro(in);
+        }
+
+        @Override
+        public Libro[] newArray(int size) {
+            return new Libro[size];
+        }
+    };
+
     // Métodos get para obtener los atributos de la clase
     public String getTitle() {
         return titulo;
@@ -41,4 +68,21 @@ public class Libro {
     public String getIdioma() { return idioma; }
     public String getPreviewLink() { return previewLink; }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel out, int flags) {
+        out.writeString(titulo);
+        out.writeString(autores);
+        out.writeString(ISBN);
+        out.writeString(imagen);
+        out.writeString(editorial);
+        out.writeString(descripcion);
+        out.writeString(idioma);
+        out.writeString(previewLink);
+
+    }
 }

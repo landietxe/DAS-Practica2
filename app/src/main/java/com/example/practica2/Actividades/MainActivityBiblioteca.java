@@ -38,9 +38,7 @@ import android.provider.MediaStore;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -63,7 +61,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -87,7 +84,7 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
     private Uri uriimagen = null;
     private String imageName;
     private File fichImg = null;
-    private boolean imagenCambiado;
+    private boolean imagenCambiado=false;
     private Bitmap bitmapImagen;
     private boolean imagenSubiendo=false;
 
@@ -113,6 +110,8 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        imagenCambiado=false;
 
         /*Obtener preferencias de idioma para actualizar los elementos del layout según el idioma y el orden
         en el que se quiere ordenar los libros*/
@@ -232,13 +231,14 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
     }
 
     @Override
-    public void seleccionarElemento(String isbn, String title, String autores, String editorial, String descripcion, String thumbnail, String previewLink, ImageView imageview) {
+    public void seleccionarElemento(String isbn, String title, String autores, String editorial, String descripcion, String thumbnail, String previewLink, ImageView imageview, boolean cambiado) {
         /*Método que se ejecuta cuando el usuario selecciona uno de sus libros. Por un lado se comprueba la orientación en la que
         se encuentra el móvil. Si el móvil está en vertical, se abrirá la actividad "InfoLibroBiblioteca" pasandole los datos del libro.
         Si el móvil está en horizontal, ya existe otro fragment en el layout, por lo que se hace cast a su clase y se llama al método
         "actualizar" para visualizar los datos. También se gestiona cuando el usuario hace click 2 veces en un mismo libro para poder cambiar su imagen.*/
         this.ISBN=isbn;
         this.imageView=imageview;
+        this.imagenCambiado=cambiado;
         int orientation = getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_LANDSCAPE){ //Pantalla en horizontal, usamos el otro fragment
             if(this.ISBN.equals(isbnClick)){
@@ -467,12 +467,10 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
         En ambos casos, se obtiene el nombre de la imagen y se llama al método "guardarImagen".*/
         if (requestCode == 10 && resultCode == RESULT_OK) { //Foto de galeria
             uriimagen = data.getData();
-            //imageName = uriimagen.toString().split("%2F")[uriimagen.toString().split("%2F").length - 1];
             imageName= new File(uriimagen.getPath()).getName();
             guardarImagen();
         }
         if (requestCode == 11 && resultCode == RESULT_OK) { //Foto tomada con teléfono
-            //imageName = uriimagen.toString().split("/")[uriimagen.toString().split("/").length - 1];
             imageName = new File(uriimagen.getPath()).getName();
             guardarImagen();
         }
@@ -483,8 +481,6 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
          se llama al método "guardarEnBD" para guardar la referencia
          de la iamgen en la base de datos Remota.
          */
-
-        this.imageView.setImageURI(uriimagen);
 
         //Obtener identificador del usuario actual
         try {
@@ -513,6 +509,7 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 imagenSubiendo = false;
+                System.out.println("Imagen subida a firebase" + imagenCambiado);
                 guardarEnBD();
             }
         });
@@ -558,6 +555,11 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
                 fichImg.deleteOnExit();
             }
         }
+
+        //Recargar la actividad
+        Intent intent = getIntent();
+        finish();
+        startActivity(intent);
     }
 
 
@@ -596,6 +598,7 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
         //Método que guarda la uri de la imagen y el estado de la música cuando se rota el dispositivo
         outState.putBoolean("reproduciendo",reproduciendo);
         outState.putParcelable("file_uri", uriimagen);
+        outState.putBoolean("imagenCambiado",imagenCambiado);
     }
 
 
@@ -605,6 +608,7 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
         //Método que recupera la uri de la imagen y el estado de la música cuando se rota el dispositivo
         this.reproduciendo=savedInstanceState.getBoolean("reproduciendo");
         uriimagen = savedInstanceState.getParcelable("file_uri");
+        imagenCambiado=savedInstanceState.getBoolean("imagenCambiado");
     }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {

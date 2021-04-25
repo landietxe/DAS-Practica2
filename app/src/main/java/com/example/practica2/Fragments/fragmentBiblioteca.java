@@ -31,7 +31,6 @@ import com.example.practica2.WorkManager.ObtenerImagenLibro;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.squareup.picasso.Picasso;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -52,6 +51,7 @@ public class fragmentBiblioteca extends Fragment {
     private TextView tvVacio;
     private listenerDelFragment elListener;
     private String user_id;
+    private boolean cambiado;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -62,7 +62,7 @@ public class fragmentBiblioteca extends Fragment {
 
     //Interfaz con el método del listener para la comunicación con el fragment definido en la actividad "MainActivityBiblioteca"
     public interface listenerDelFragment{
-        void seleccionarElemento(String isbn, String title, String autores, String editorial, String descripcion, String thumbnail, String previewLink, ImageView imagen);
+        void seleccionarElemento(String isbn, String title, String autores, String editorial, String descripcion, String thumbnail, String previewLink, ImageView imagen, boolean cambiado);
     }
 
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -190,6 +190,7 @@ public class fragmentBiblioteca extends Fragment {
                                         Glide.with(getContext()).load(url).into(holder.laimagen);
                                     }
                                 }
+                                cambiado=imagenCambiado;
                             }
                         }
 
@@ -203,7 +204,7 @@ public class fragmentBiblioteca extends Fragment {
                 public void onClick(View v) {
                     /*Método que se ejecuta cuando se pulsa en un elemento del recyclerview. Este método
                     asigna el método "seleccionarElemento" del listener.*/
-                    elListener.seleccionarElemento(libro.getISBN(),libro.getTitle(),libro.getAutores(),libro.getEditorial(),libro.getDescripcion(),libro.getThumbnail(),libro.getPreviewLink(),holder.laimagen);
+                    elListener.seleccionarElemento(libro.getISBN(),libro.getTitle(),libro.getAutores(),libro.getEditorial(),libro.getDescripcion(),libro.getThumbnail(),libro.getPreviewLink(),holder.laimagen,cambiado);
                 }
             });
             }

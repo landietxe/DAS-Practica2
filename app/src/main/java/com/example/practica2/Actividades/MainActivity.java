@@ -22,6 +22,7 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Gravity;
@@ -103,7 +104,6 @@ public class MainActivity extends AppCompatActivity implements DialogoImagen.Lis
         //Obtener referencias a los elementos del layout
         editTextLibro = (EditText) findViewById(R.id.editTextLibro);
         elreciclerview = (RecyclerView) findViewById(R.id.recyclerview);
-
 
         bookInfoArrayList = new ArrayList<>();
         //Establecer cómo se desea que se organicen los elementos dentro del RecyclerView
@@ -414,13 +414,24 @@ public class MainActivity extends AppCompatActivity implements DialogoImagen.Lis
         super.onSaveInstanceState(outState);
         //Método que guarda la uri de la imagen cuando se rota el dispositivo
         outState.putParcelable("file_uri", uriimagen);
+        outState.putParcelableArrayList("booklist",bookInfoArrayList);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        //Método que recupera la uri de la imagen cuando se rota el dispositivo
+        //Método que recupera la uri de la imagen  y la lista de resultados cuando se rota el dispositivo
         uriimagen = savedInstanceState.getParcelable("file_uri");
+        ArrayList<Libro> booklist = savedInstanceState.getParcelableArrayList("booklist");
+        if(booklist != null && booklist.size() >0 ){
+            bookInfoArrayList = booklist;
+            //Establecer cómo se desea que se organicen los elementos dentro del RecyclerView
+            eladaptador = new AdaptadorRecycler(bookInfoArrayList, this);
+            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(MainActivity.this, RecyclerView.VERTICAL, false);
+            elreciclerview.setLayoutManager(linearLayoutManager);
+            elreciclerview.setAdapter(eladaptador);
+        }
+
     }
 
 
