@@ -69,4 +69,5 @@
     <string name="reproducir_musica">Reproducir</string>
     <string name="parar_musica">Parar</string>
     <string name="isbnEncontrado">ISBN encontrado:</string>
+    <string name="libroCompartido">Libro Compartido</string>
 </resources>

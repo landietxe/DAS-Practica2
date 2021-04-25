@@ -164,13 +164,13 @@
         style="@style/boton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="15dp"
+        android:layout_marginBottom="16dp"
         android:background="@drawable/boton"
         android:onClick="onClickPreview"
         android:text="PREVIEW"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.213"
+        app:layout_constraintHorizontal_bias="0.165"
         app:layout_constraintStart_toEndOf="@+id/botonAñadir" />
 
     <Button

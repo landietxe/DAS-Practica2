@@ -13,7 +13,7 @@ import com.example.practica2.R;
 /*Clase para crear una ventana emergente con un diálogo para que el usuario seleccione como conseguir una foto;
 utilizando la camara del móvil o cargándolo desde la galería.
  */
-public class DialogoImagen extends DialogFragment {
+public class  DialogoImagen extends DialogFragment {
     DialogoImagen.ListenerdelDialogo miListener;
     private String titulo;
     private String texto;
@@ -58,6 +58,7 @@ public class DialogoImagen extends DialogFragment {
             }
 
         });
+        setRetainInstance(true);
         return builder.create();
     }
 }

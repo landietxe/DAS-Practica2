@@ -67,4 +67,5 @@
     <string name="reproducir_musica">Play</string>
     <string name="parar_musica">Stop</string>
     <string name="isbnEncontrado">ISBN found:</string>
+    <string name="libroCompartido">Book shared</string>
 </resources>

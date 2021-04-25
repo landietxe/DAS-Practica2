@@ -62,6 +62,7 @@ import org.json.simple.parser.ParseException;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.SQLOutput;
@@ -369,7 +370,8 @@ public class InfoLibroBiblioteca extends AppCompatActivity implements DialogoCon
                     public void onChanged(WorkInfo workInfo) {
                         if(workInfo != null && workInfo.getState().isFinished()){
                             //Se muestra un Toast indicando que el libro ha sido compartido.
-                            Toast.makeText(getApplicationContext(),"Libro compartido",Toast.LENGTH_SHORT).show();
+                            String text = getString(R.string.libroCompartido);
+                            Toast.makeText(getApplicationContext(),text,Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -444,37 +446,21 @@ public class InfoLibroBiblioteca extends AppCompatActivity implements DialogoCon
     }
 
     public void guardarImagen(){
-        /*En este método por un lado se llama al método "reescalarImagen" para escalar la imagen
-         al tamaño que se va a mostrar, pero manteniendo su aspecto. Después, se sube la imagen a Firebase
-         y en caso de que se suba correctamente, se llama al método "guardarEnBD" para guardar la referencia
+        /*En este método se sube la imagen a Firebase y en caso de que se suba correctamente,
+        se llama al método "guardarEnBD" para guardar la referencia
          de la iamgen en la base de datos Remota.
          */
 
-
-        //Escalar la imagen
-        try {
-            bitmapImagen = reescalarImagen();
-            imagen.setRotation(90);
-            imagen.setImageBitmap(bitmapImagen);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        imagen.setImageURI(uriimagen);
 
         //Subir imagen a Firebase
         FirebaseStorage storage = FirebaseStorage.getInstance();
         StorageReference storageRef = storage.getReference();
         StorageReference spaceRef = storageRef.child(imageName);
 
-        imagenSubiendo=true;
         String texto = getString(R.string.guardandoImagen);
         Toast.makeText(getApplicationContext(),texto,Toast.LENGTH_SHORT).show();
         UploadTask uploadTask = spaceRef.putFile(uriimagen);
-        try {
-            Thread.sleep(6000); // Delay para que se suba la foto a Firebase y se pueda cargar correctamente
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         uploadTask.addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
@@ -533,33 +519,6 @@ public class InfoLibroBiblioteca extends AppCompatActivity implements DialogoCon
             }
         }
     }
-    public  Bitmap reescalarImagen() throws IOException {
-
-        /*Método que escala la imagen al tamaño que se van a mostrar, pero
-        manteniendo su aspecto*/
-
-        //bitmapFoto tiene cargada la imagen en tamaño original
-        Bitmap bitmapFoto = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uriimagen);
-        int anchoDestino = imagen.getWidth();
-        int altoDestino = imagen.getHeight();
-        int anchoImagen = bitmapFoto.getWidth();
-        int altoImagen = bitmapFoto.getHeight();
-        float ratioImagen = (float) anchoImagen / (float) altoImagen;
-        float ratioDestino = (float) anchoDestino / (float) altoDestino;
-        int anchoFinal = anchoDestino;
-        int altoFinal = altoDestino;
-        if (ratioDestino > ratioImagen) {
-            anchoFinal = (int) ((float) altoDestino * ratioImagen);
-        } else {
-            altoFinal = (int) ((float) anchoDestino / ratioImagen);
-        }
-
-        //bitmapredimensionado contiene la imagen escalada al tamaño del destino
-        Bitmap bitmapredimensionado = Bitmap.createScaledBitmap(bitmapFoto, anchoFinal, altoFinal, true);
-
-        return bitmapredimensionado;
-    }
-
 
     public boolean comprobarPermisos(){
 

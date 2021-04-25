@@ -479,18 +479,12 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
     }
 
     public void guardarImagen() {
-                /*En este método por un lado se llama al método "reescalarImagen" para escalar la imagen
-         al tamaño que se va a mostrar, pero manteniendo su aspecto. Después, se sube la imagen a Firebase
-         y en caso de que se suba correctamente, se llama al método "guardarEnBD" para guardar la referencia
+        /*En este método se sube la imagen a Firebase y en caso de que se suba correctamente,
+         se llama al método "guardarEnBD" para guardar la referencia
          de la iamgen en la base de datos Remota.
          */
-        try {
-            bitmapImagen = reescalarImagen();
-            this.imageView.setRotation(90);
-            this.imageView.setImageBitmap(bitmapImagen);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+        this.imageView.setImageURI(uriimagen);
 
         //Obtener identificador del usuario actual
         try {
@@ -510,12 +504,6 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
         UploadTask uploadTask = spaceRef.putFile(uriimagen);
         String texto = getString(R.string.guardandoImagen);
         Toast.makeText(getApplicationContext(), texto, Toast.LENGTH_SHORT).show();
-        try {
-            Thread.sleep(6000); // Delay para que se suba la foto a Firebase y se pueda cargar correctamente
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         uploadTask.addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
@@ -572,28 +560,6 @@ public class MainActivityBiblioteca extends AppCompatActivity implements fragmen
         }
     }
 
-    public Bitmap reescalarImagen() throws IOException {
-        /*Método que escala la imagen al tamaño que se van a mostrar, pero
-        manteniendo su aspecto*/
-
-        Bitmap bitmapFoto = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uriimagen);
-        int anchoDestino = this.imageView.getWidth();
-        int altoDestino = this.imageView.getHeight();
-        int anchoImagen = bitmapFoto.getWidth();
-        int altoImagen = bitmapFoto.getHeight();
-        float ratioImagen = (float) anchoImagen / (float) altoImagen;
-        float ratioDestino = (float) anchoDestino / (float) altoDestino;
-        int anchoFinal = anchoDestino;
-        int altoFinal = altoDestino;
-        if (ratioDestino > ratioImagen) {
-            anchoFinal = (int) ((float) altoDestino * ratioImagen);
-        } else {
-            altoFinal = (int) ((float) anchoDestino / ratioImagen);
-        }
-        Bitmap bitmapredimensionado = Bitmap.createScaledBitmap(bitmapFoto, anchoFinal, altoFinal, true);
-
-        return bitmapredimensionado;
-    }
 
     public boolean comprobarPermisos(){
                 /*Método que comprueba si el usuario ha concedido a la aplicación los permisos de

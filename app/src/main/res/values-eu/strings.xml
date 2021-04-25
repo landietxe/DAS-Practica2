@@ -67,4 +67,5 @@
     <string name="reproducir_musica">Hasi</string>
     <string name="parar_musica">Gelditu</string>
     <string name="isbnEncontrado">Aurkitutako ISBN:</string>
+    <string name="libroCompartido">Liburua partekatu da</string>
 </resources>

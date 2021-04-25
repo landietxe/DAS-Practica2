@@ -423,6 +423,32 @@ public class MainActivity extends AppCompatActivity implements DialogoImagen.Lis
         uriimagen = savedInstanceState.getParcelable("file_uri");
     }
 
+
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode){
+            case 0:{
+                // Si la petición se cancela, granResults estará vacío
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // PERMISO CONCEDIDO, EJECUTAR LA FUNCIONALIDAD
+                    String titulo = getString(R.string.escanearLibro);
+                    String texto= getString(R.string.escanearModo);
+                    DialogFragment dialogoImagen= new DialogoImagen(titulo,texto);
+                    dialogoImagen.show(getSupportFragmentManager(), "etiqueta");
+                }
+                else {
+                    // PERMISO DENEGADO, DESHABILITAR LA FUNCIONALIDAD O EJECUTAR ALTERNATIVA
+                }
+                return;
+            }
+        }
+    }
+
+
     @Override
     public void onBackPressed(){
         /*Método que se ejecuta cuando el usuario pulsa el bóton del móvil para volver hacia atras.
